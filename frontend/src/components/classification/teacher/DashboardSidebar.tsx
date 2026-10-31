@@ -1,0 +1,23 @@
+const navigation = ['Dashboard', 'Classes', 'Exams', 'Question bank', 'Live monitoring', 'Grading', 'Gradebook', 'Reports', 'Settings']
+type DashboardSidebarProps = { dark: boolean; onToggleTheme: () => void }
+
+export function DashboardSidebar({ dark, onToggleTheme }: DashboardSidebarProps) {
+
+  return (
+    <aside className="dashboard-sidebar">
+      <a className="dashboard-brand" href="/teacher/dashboard" aria-label="Anticopia dashboard">
+        <img src="/anticopia-logo.png" alt="" />
+        <span>Anticopia</span>
+      </a>
+      <nav className="dashboard-nav" aria-label="Teacher navigation">
+        {navigation.map((item) => (
+          <a key={item} className={item === 'Dashboard' ? 'active' : ''} href={item === 'Classes' ? '#classes' : item === 'Exams' || item === 'Question bank' || item === 'Live monitoring' ? '#exams' : item === 'Grading' || item === 'Gradebook' || item === 'Reports' ? '#summary' : '#overview'}>{item}</a>
+        ))}
+      </nav>
+      <div className="dashboard-sidebar-footer">
+        <button type="button" onClick={onToggleTheme} aria-pressed={dark}>{dark ? 'Dark mode' : 'Light / dark'}</button>
+        <a href="/signin">Sign out</a>
+      </div>
+    </aside>
+  )
+}
