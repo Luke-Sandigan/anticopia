@@ -137,3 +137,61 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .submission-progress { width: 100%; }
 }
 @media (max-width: 480px) { .dashboard-header h1 { font-size: 19px; } .dashboard-panel { padding: 11px; } .dashboard-top-grid { gap: 10px; } .class-cards { display: grid; grid-template-columns: 1fr; } .class-card { min-width: 0; } }
+
+/* Teacher classes and create/edit dialog */
+.classes-main { padding-top: 24px; }
+.classes-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 20px; }
+.classes-header h1 { margin: 0; color: var(--dashboard-text); font-size: 28px; line-height: 1.2; letter-spacing: -.04em; }
+.classes-header p { margin: 2px 0 0; color: var(--dashboard-muted); font-size: 16px; }
+.class-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 312px)); gap: 16px; align-items: start; }
+.managed-class-card { min-height: 201px; padding: 17px 18px; background: var(--dashboard-surface); border: 1px solid var(--dashboard-border); border-radius: 11px; }
+.managed-class-card h2 { margin: 0; color: var(--dashboard-text); font-size: 16px; font-weight: 700; line-height: 1.35; }
+.managed-class-card > p { min-height: 40px; margin: 1px 0 13px; color: var(--dashboard-muted); font-size: 14px; line-height: 1.45; }
+.class-invite-row { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.class-code { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 99px; color: #246db4; background: #f0f5fb; font-size: 12px; white-space: nowrap; }
+.class-code i { width: 7px; height: 7px; border-radius: 50%; background: #2d76bf; }
+.generate-code { padding: 4px 0; border: 0; background: transparent; color: var(--dashboard-text); font: inherit; font-size: 13px; white-space: nowrap; cursor: pointer; }
+.generate-code:hover { color: #2d76bf; text-decoration: underline; }
+.class-actions { display: flex; gap: 9px; }
+.class-button { min-height: 36px; padding: 0 13px; border: 1px solid var(--dashboard-border); border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer; transition: background-color .15s ease, border-color .15s ease; }
+.class-button.primary { border-color: #2d76bf; background: #2d76bf; color: #fff; font-weight: 600; }
+.class-button.primary:hover { border-color: #2367ac; background: #2367ac; }
+.class-button.secondary { background: var(--dashboard-surface); color: var(--dashboard-text); }
+.class-button.secondary:hover { background: color-mix(in srgb, var(--dashboard-bg) 70%, var(--dashboard-surface)); }
+.create-class-button { min-width: 120px; min-height: 42px; }
+.class-notice { position: relative; margin: -4px 0 16px; padding: 10px 42px 10px 13px; border: 1px solid var(--dashboard-border); border-radius: 9px; background: var(--dashboard-surface); color: var(--dashboard-text); }
+.class-notice button { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); border: 0; background: transparent; color: var(--dashboard-muted); font-size: 20px; cursor: pointer; }
+.empty-classes { grid-column: 1 / -1; padding: 30px; border: 1px dashed var(--dashboard-border); border-radius: 12px; background: var(--dashboard-surface); }
+.empty-classes h2 { margin: 0; color: var(--dashboard-text); }
+.empty-classes p { margin: 6px 0 14px; color: var(--dashboard-muted); }
+.class-dialog-backdrop { position: fixed; z-index: 30; inset: 0; display: grid; place-items: center; padding: 20px; overflow-y: auto; background: rgb(12 27 43 / 58%); }
+.class-dialog { width: min(100%, 520px); max-height: calc(100vh - 40px); overflow-y: auto; padding: 23px 24px 22px; border: 1px solid #d2deeb; border-radius: 16px; background: #fff; box-shadow: 0 20px 60px rgb(13 32 52 / 20%); }
+.class-dialog h2 { margin: 0 0 17px; color: #102d4b; font-size: 20px; line-height: 1.3; }
+.class-dialog form { display: grid; gap: 16px; }
+.class-dialog label { display: grid; gap: 8px; color: #102d4b; font-size: 14px; font-weight: 500; }
+.class-dialog input { width: 100%; height: 48px; padding: 0 14px; border: 1px solid #d2deeb; border-radius: 12px; outline: none; background: #f4f8fc; color: #102d4b; font: inherit; font-size: 15px; }
+.class-dialog input:focus { border-color: #2d76bf; box-shadow: 0 0 0 3px rgb(45 118 191 / 15%); }
+.class-dialog-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 0; }
+.class-dialog-actions .class-button { min-height: 43px; padding-inline: 16px; }
+.theme-dark .class-dialog { border-color: #344964; background: #172942; }
+.theme-dark .class-dialog h2, .theme-dark .class-dialog label { color: #eaf2fb; }
+.theme-dark .class-dialog input { border-color: #405674; background: #1e314c; color: #edf4fc; color-scheme: dark; }
+.theme-dark .class-code { color: #a7d2ff; background: #203653; }
+
+@media (max-width: 760px) {
+  .classes-main { padding-top: 18px; }
+  .classes-header { align-items: center; }
+  .classes-header h1 { font-size: 25px; }
+  .classes-header p { font-size: 14px; }
+  .class-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr)); }
+}
+@media (max-width: 520px) {
+  .classes-header { align-items: stretch; flex-direction: column; gap: 12px; margin-bottom: 15px; }
+  .create-class-button { width: 100%; }
+  .class-grid { grid-template-columns: minmax(0, 1fr); gap: 11px; }
+  .managed-class-card { min-height: 0; padding: 15px; }
+  .managed-class-card > p { min-height: 0; }
+  .class-dialog-backdrop { padding: 12px; }
+  .class-dialog { max-height: calc(100vh - 24px); padding: 20px 17px 16px; border-radius: 14px; }
+  .class-dialog form { gap: 13px; }
+}
