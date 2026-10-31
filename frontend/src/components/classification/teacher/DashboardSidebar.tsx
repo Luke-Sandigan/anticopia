@@ -11,7 +11,7 @@ export function DashboardSidebar({ dark, onToggleTheme, activePage = 'Dashboard'
       </a>
       <nav className="dashboard-nav" aria-label="Teacher navigation">
         {navigation.map((item) => (
-          <a key={item} className={item === activePage ? 'active' : ''} aria-current={item === activePage ? 'page' : undefined} href={item === 'Dashboard' ? '/teacher/dashboard' : item === 'Classes' ? '/teacher/classes' : item === 'Exams' ? '/teacher/exams' : item === 'Question bank' || item === 'Live monitoring' ? '#exams' : item === 'Grading' || item === 'Gradebook' || item === 'Reports' ? '#summary' : '#overview'}>{item}</a>
+          <a key={item} className={item === activePage ? 'active' : ''} aria-current={item === activePage ? 'page' : undefined} href={item === 'Dashboard' ? '/teacher/dashboard' : item === 'Classes' ? '/teacher/classes' : item === 'Exams' ? '/teacher/exams' : item === 'Question bank' ? '/teacher/question-bank' : item === 'Live monitoring' ? '#monitoring' : item === 'Grading' || item === 'Gradebook' || item === 'Reports' ? '#summary' : '#overview'}>{item}</a>
         ))}
       </nav>
       <div className="dashboard-sidebar-footer">

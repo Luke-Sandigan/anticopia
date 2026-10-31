@@ -6,6 +6,7 @@ import { TeacherDashboardPage } from './pages/classification/teacher/TeacherDash
 import { TeacherClassesPage } from './pages/classification/teacher/TeacherClassesPage'
 import { TeacherClassDetailPage } from './pages/classification/teacher/TeacherClassDetailPage'
 import { TeacherExamsPage } from './pages/classification/teacher/TeacherExamsPage'
+import { TeacherQuestionBankPage } from './pages/classification/teacher/TeacherQuestionBankPage'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Route path="/teacher/classes" element={<TeacherClassesPage />} />
       <Route path="/teacher/classes/:classId" element={<TeacherClassDetailPage />} />
       <Route path="/teacher/exams" element={<TeacherExamsPage />} />
+      <Route path="/teacher/question-bank" element={<TeacherQuestionBankPage />} />
       <Route path="*" element={<Navigate to="/signin" replace />} />
     </Routes>
   )
