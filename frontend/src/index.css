@@ -195,3 +195,64 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .class-dialog { max-height: calc(100vh - 24px); padding: 20px 17px 16px; border-radius: 14px; }
   .class-dialog form { gap: 13px; }
 }
+
+/* Class roster and exams */
+.class-detail-main { padding-top: 19px; }
+.class-detail-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 17px; }
+.class-detail-header h1 { margin: 0; color: var(--dashboard-text); font-size: 24px; line-height: 1.25; letter-spacing: -.035em; }
+.class-detail-header p { margin: 2px 0 0; color: var(--dashboard-muted); font-size: 14px; }
+.back-to-classes { min-height: 36px; text-decoration: none; }
+.roster-panel { padding: 14px; }
+.roster-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+.roster-heading h2, .class-exams-panel h2 { margin: 0; color: var(--dashboard-text); font-size: 16px; }
+.roster-actions { display: flex; gap: 9px; }
+.roster-actions .class-button { min-height: 36px; font-size: 13px; }
+.roster-search { display: block; margin-bottom: 11px; }
+.roster-search input { width: 100%; height: 41px; padding: 0 13px; border: 1px solid var(--dashboard-border); border-radius: 10px; outline: none; background: color-mix(in srgb, var(--dashboard-bg) 58%, var(--dashboard-surface)); color: var(--dashboard-text); font: inherit; font-size: 14px; }
+.roster-search input::placeholder { color: var(--dashboard-muted); }
+.roster-search input:focus { border-color: #2d76bf; box-shadow: 0 0 0 3px rgb(45 118 191 / 14%); }
+.roster-table { width: 100%; min-width: 960px; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
+.roster-table th { height: 36px; padding: 0 10px; color: var(--dashboard-muted); font-weight: 500; text-align: left; }
+.roster-table td { height: 46px; padding: 0 10px; border-top: 1px solid var(--dashboard-border); color: var(--dashboard-text); }
+.roster-table th:first-child, .roster-table td:first-child { min-width: 210px; }
+.roster-table th:nth-child(2), .roster-table td:nth-child(2) { min-width: 170px; }
+.roster-table th:nth-child(3), .roster-table td:nth-child(3) { min-width: 190px; }
+.roster-table th:nth-child(4), .roster-table td:nth-child(4) { min-width: 200px; }
+.roster-table th:nth-child(5), .roster-table td:nth-child(5) { min-width: 260px; }
+.roster-table th:last-child, .roster-table td:last-child { min-width: 115px; text-align: center; }
+.roster-status { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border-radius: 99px; font-size: 11px; }
+.roster-status i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.roster-status.enrolled, .roster-status.active { color: #26844c; background: #def3e7; }
+.roster-status.unverified { color: #8a5a00; background: #fff0c9; }
+.roster-status.closed { color: #607994; background: #e8edf3; }
+.performance-cell { display: flex; align-items: center; gap: 10px; }
+.performance-track { width: 65px; height: 7px; overflow: hidden; border-radius: 99px; background: #e1e7ee; }
+.performance-track i { display: block; height: 100%; background: #2d76bf; }
+.remove-student { min-height: 30px; padding-inline: 11px; font-size: 12px; }
+.no-roster-results { margin: 0; padding: 18px 10px; color: var(--dashboard-muted); }
+.class-exams-panel { margin-top: 15px; }
+.class-exams-panel table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.class-exams-panel th { height: 38px; padding: 0 10px; color: var(--dashboard-muted); text-align: left; font-weight: 500; }
+.class-exams-panel td { height: 43px; padding: 0 10px; border-top: 1px solid var(--dashboard-border); color: var(--dashboard-text); }
+.class-exams-panel th:first-child, .class-exams-panel td:first-child { width: 50%; }
+.class-exams-panel th:nth-child(2), .class-exams-panel td:nth-child(2) { width: 28%; }
+.class-exams-panel th:last-child, .class-exams-panel td:last-child { width: 22%; }
+.class-exams-panel .table-scroll { overflow-x: auto; }
+.import-roster-dialog input[type="file"] { height: auto; min-height: 48px; padding: 10px; }
+.theme-dark .roster-search input { background: #1e314c; color: #edf4fc; }
+.theme-dark .performance-track { background: #344964; }
+@media (max-width: 760px) {
+  .class-detail-main { padding-top: 16px; }
+  .class-detail-header h1 { font-size: 21px; }
+  .class-detail-header p { font-size: 13px; }
+  .roster-panel { padding: 11px; }
+  .roster-heading { align-items: flex-start; flex-direction: column; }
+  .roster-actions { width: 100%; }
+  .roster-actions .class-button { flex: 1; }
+}
+@media (max-width: 520px) {
+  .class-detail-header { flex-direction: column; }
+  .back-to-classes { align-self: flex-start; }
+  .class-exams-panel { padding: 11px; }
+  .class-exams-panel table { min-width: 480px; }
+}

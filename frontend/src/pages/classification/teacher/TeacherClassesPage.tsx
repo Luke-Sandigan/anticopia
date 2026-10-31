@@ -1,18 +1,15 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ClassDialog, type ClassDetails } from '../../../components/classification/teacher/ClassDialog'
 import { DashboardSidebar } from '../../../components/classification/teacher/DashboardSidebar'
-
-const starterClasses: ClassDetails[] = [
-  { id: 'it-201', name: 'IT-201 Data Structures', section: 'Section A', subject: 'Computer Science', term: 'Term 1, 2026', code: 'DS-4K9Q' },
-  { id: 'it-305', name: 'IT-305 Databases', section: 'Section B', subject: 'Information Technology', term: 'Term 1, 2026', code: 'DB-7M2X' },
-  { id: 'it-110', name: 'IT-110 Intro to Programming', section: 'Section C', subject: 'Information Technology', term: 'Term 1, 2026', code: 'IP-2H8R' },
-]
+import { starterClasses } from '../../../data/teacherClasses'
 
 function makeCode() {
   return Math.random().toString(36).slice(2, 6).toUpperCase() + '-' + Math.random().toString(36).slice(2, 4).toUpperCase()
 }
 
 export function TeacherClassesPage() {
+  const navigate = useNavigate()
   const [classes, setClasses] = useState(starterClasses)
   const [dialog, setDialog] = useState<'create' | 'edit' | null>(null)
   const [editing, setEditing] = useState<ClassDetails | undefined>()
@@ -65,7 +62,7 @@ export function TeacherClassesPage() {
             <p>{item.section} · {item.subject} · {item.term}</p>
             <div className="class-invite-row"><span className="class-code"><i />Code {item.code}</span><button type="button" className="generate-code" onClick={() => regenerateCode(item.id)}>Generate new</button></div>
             <div className="class-actions">
-              <button type="button" className="class-button primary" onClick={() => setNotice(`${item.name} workspace is ready.`)}>Open</button>
+              <button type="button" className="class-button primary" onClick={() => navigate(`/teacher/classes/${item.id}`, { state: item })}>Open</button>
               <button type="button" className="class-button secondary" onClick={() => openEdit(item)}>Edit</button>
               <button type="button" className="class-button secondary" onClick={() => archiveClass(item)}>Archive</button>
             </div>
