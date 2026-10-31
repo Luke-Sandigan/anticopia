@@ -5,6 +5,7 @@ import { StudentSignUpPage } from './pages/classification/student/StudentSignUpP
 import { TeacherDashboardPage } from './pages/classification/teacher/TeacherDashboardPage'
 import { TeacherClassesPage } from './pages/classification/teacher/TeacherClassesPage'
 import { TeacherClassDetailPage } from './pages/classification/teacher/TeacherClassDetailPage'
+import { TeacherExamsPage } from './pages/classification/teacher/TeacherExamsPage'
 
 function App() {
   return (
@@ -16,9 +17,11 @@ function App() {
       <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
       <Route path="/teacher/classes" element={<TeacherClassesPage />} />
       <Route path="/teacher/classes/:classId" element={<TeacherClassDetailPage />} />
+      <Route path="/teacher/exams" element={<TeacherExamsPage />} />
       <Route path="*" element={<Navigate to="/signin" replace />} />
     </Routes>
   )
 }
 
 export default App
+
