@@ -6,12 +6,12 @@ export function DashboardSidebar({ dark, onToggleTheme, activePage = 'Dashboard'
   return (
     <aside className="dashboard-sidebar">
       <a className="dashboard-brand" href="/teacher/dashboard" aria-label="Anticopia dashboard">
-        <img src="/anticopia-logo.png" alt="" />
+        <img src="/shield-check.svg" alt="" />
         <span>Anticopia</span>
       </a>
       <nav className="dashboard-nav" aria-label="Teacher navigation">
         {navigation.map((item) => (
-          <a key={item} className={item === activePage ? 'active' : ''} aria-current={item === activePage ? 'page' : undefined} href={item === 'Dashboard' ? '/teacher/dashboard' : item === 'Classes' ? '/teacher/classes' : item === 'Exams' ? '/teacher/exams' : item === 'Question bank' ? '/teacher/question-bank' : item === 'Live monitoring' ? '#monitoring' : item === 'Grading' || item === 'Gradebook' || item === 'Reports' ? '#summary' : '#overview'}>{item}</a>
+          <a key={item} className={item === activePage ? 'active' : ''} aria-current={item === activePage ? 'page' : undefined} href={item === 'Dashboard' ? '/teacher/dashboard' : item === 'Classes' ? '/teacher/classes' : item === 'Exams' ? '/teacher/exams' : item === 'Question bank' ? '/teacher/question-bank' : item === 'Live monitoring' ? '/teacher/live-monitoring' : item === 'Grading' || item === 'Gradebook' || item === 'Reports' ? '#summary' : '#overview'}>{item}</a>
         ))}
       </nav>
       <div className="dashboard-sidebar-footer">
