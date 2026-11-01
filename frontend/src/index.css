@@ -375,6 +375,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .monitoring-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 450px); gap: 12px; align-items: start; }
 .monitoring-students { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 .student-stream { min-width: 0; min-height: 161px; padding: 12px; border: 1px solid var(--dashboard-border); border-left: 3px solid #3b9d62; border-radius: 8px; background: var(--dashboard-surface); }
+.student-stream { color: inherit; text-decoration: none; transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease; }
+.student-stream:hover { box-shadow: 0 5px 14px rgb(13 32 52 / 12%); transform: translateY(-1px); }
 .student-stream.left-tab { border-left-color: #b67a0b; }
 .student-stream.offline { border-left-color: #9baec3; }
 .stream-preview { height: 116px; display: flex; align-items: flex-start; padding: 10px; border: 1px solid #d8e2ee; border-radius: 7px; background: #f0f5fb; color: #7e93aa; font-size: 10px; }
@@ -424,4 +426,64 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .monitoring-header { align-items: stretch; flex-direction: column; }
   .end-session-button { width: 100%; }
   .monitoring-students { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ── Student monitoring detail ───────────────────────────────────── */
+.monitoring-detail-main { padding-top: 16px; }
+.monitoring-detail-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+.monitoring-detail-header h1 { margin: 0; color: var(--dashboard-text); font-size: 18px; line-height: 1.3; letter-spacing: -.03em; }
+.monitoring-detail-header p { margin: 1px 0 0; color: var(--dashboard-muted); font-size: 11px; }
+.back-to-room { min-height: 26px; display: inline-flex; align-items: center; padding: 0 10px; border: 1px solid var(--dashboard-border); border-radius: 7px; background: var(--dashboard-surface); color: var(--dashboard-text); font-size: 10px; text-decoration: none; }
+.back-to-room:hover { border-color: #2d76bf; color: #2d76bf; }
+.monitoring-detail-layout { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(360px, 1fr); gap: 12px; align-items: start; }
+.monitoring-detail-left { display: grid; gap: 10px; }
+.student-screen-panel { padding: 10px; }
+.student-screen-panel h2, .teacher-decision-panel h2, .activity-timeline h2 { margin: 0 0 8px; color: var(--dashboard-text); font-size: 11px; font-weight: 700; }
+.student-screen-preview { height: min(458px, calc(100vh - 212px)); min-height: 280px; display: flex; align-items: flex-start; padding: 12px; border: 1px solid #d8e2ee; border-radius: 6px; background: #f0f5fb; color: #7e93aa; font-size: 11px; }
+.student-screen-placeholder { width: 100%; display: grid; gap: 7px; }
+.student-screen-placeholder i { display: block; width: 60%; height: 4px; border-radius: 99px; background: #d2deeb; }
+.student-screen-placeholder i:nth-child(2) { width: 84%; }
+.student-screen-placeholder i:nth-child(3) { width: 40%; }
+.screen-event { display: inline-flex; align-items: center; gap: 5px; width: 100%; min-height: 13px; margin-top: 8px; padding: 0 7px; border-radius: 99px; font-size: 9px; }
+.screen-event i, .timeline-event-kind i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.screen-event.tab, .timeline-event-kind.tab { color: #8a5a00; background: #fff0c9; }
+.screen-event.copied, .timeline-event-kind.copied { color: #a3322d; background: #f9dddd; }
+.screen-event.started, .timeline-event-kind.started { color: #26844c; background: #def3e7; }
+.screen-event.offline, .timeline-event-kind.offline { color: #607994; background: #e8edf3; }
+.teacher-decision-panel { padding: 10px; }
+.teacher-decision-panel form { display: grid; gap: 8px; }
+.teacher-decision-panel label { display: grid; gap: 5px; color: var(--dashboard-text); font-size: 10px; }
+.teacher-decision-panel textarea { width: 100%; min-height: 41px; padding: 8px 10px; border: 1px solid var(--dashboard-border); border-radius: 7px; outline: none; resize: vertical; background: #f4f8fc; color: var(--dashboard-text); font: inherit; font-size: 10px; }
+.teacher-decision-panel textarea:focus { border-color: #2d76bf; box-shadow: 0 0 0 3px rgb(45 118 191 / 14%); }
+.save-decision-button { min-height: 29px; border: 1px solid #2d76bf; border-radius: 7px; background: #2d76bf; color: #fff; font: inherit; font-size: 10px; font-weight: 600; cursor: pointer; }
+.save-decision-button:hover { border-color: #2367ac; background: #2367ac; }
+.decision-saved { margin: 7px 0 0; color: #26844c; font-size: 10px; }
+.activity-timeline { padding: 11px; }
+.timeline-events { display: grid; }
+.timeline-event { display: grid; gap: 4px; padding: 0 0 9px; border-bottom: 1px solid var(--dashboard-border); }
+.timeline-event + .timeline-event { padding-top: 9px; }
+.timeline-event:last-child { padding-bottom: 1px; border-bottom: 0; }
+.timeline-event-kind { display: inline-flex; align-items: center; gap: 5px; min-height: 14px; padding: 0 7px; border-radius: 99px; font-size: 9px; }
+.timeline-event time { color: var(--dashboard-muted); font-size: 9px; }
+.timeline-event-actions { display: flex; align-items: center; gap: 6px; }
+.timeline-event-actions select, .timeline-event-actions button { height: 20px; border: 1px solid var(--dashboard-border); border-radius: 6px; background: var(--dashboard-surface); color: var(--dashboard-text); font: inherit; font-size: 9px; }
+.timeline-event-actions select { min-width: 84px; padding: 0 5px; }
+.timeline-event-actions button { padding: 0 8px; cursor: pointer; }
+.timeline-event-actions button:hover { border-color: #2d76bf; color: #2d76bf; }
+.theme-dark .student-screen-preview, .theme-dark .teacher-decision-panel textarea { border-color: #405674; background: #1e314c; color: #edf4fc; }
+.theme-dark .student-screen-placeholder i { background: #405674; }
+.theme-dark .screen-event.tab, .theme-dark .timeline-event-kind.tab { color: #ffd276; background: #554216; }
+.theme-dark .screen-event.copied, .theme-dark .timeline-event-kind.copied { color: #ffa9a4; background: #542d35; }
+.theme-dark .screen-event.started, .theme-dark .timeline-event-kind.started { color: #80d8a0; background: #214d35; }
+.theme-dark .screen-event.offline, .theme-dark .timeline-event-kind.offline { color: #bdcce0; background: #344964; }
+.theme-dark .timeline-event-actions select, .theme-dark .timeline-event-actions button { border-color: #405674; background: #1e314c; color: #edf4fc; color-scheme: dark; }
+
+@media (max-width: 980px) {
+  .monitoring-detail-layout { grid-template-columns: minmax(0, 1fr); }
+  .student-screen-preview { height: 400px; }
+}
+@media (max-width: 520px) {
+  .monitoring-detail-header { align-items: stretch; flex-direction: column; }
+  .back-to-room { align-self: flex-start; }
+  .student-screen-preview { height: 310px; min-height: 0; }
 }
