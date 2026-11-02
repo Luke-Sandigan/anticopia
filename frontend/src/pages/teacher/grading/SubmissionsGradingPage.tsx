@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { DashboardSidebar } from '../../../components/classification/teacher/DashboardSidebar'
 import { AttemptsTable, type Attempt } from '../../../components/grading/AttemptsTable'
+import { GradeEssayModal } from '../../../components/grading/GradeEssayModal'
+import { PrimaryButton, SecondaryButton } from '../../../components/ui/Buttons'
+import { Modal } from '../../../components/ui/Modal'
 
 const mockAttempts: Attempt[] = [
   { id: 'maria-santos', studentName: 'Maria Santos', status: 'submitted', autoScore: 18, totalPoints: 24, essayStatus: 'needs_grading' },
@@ -15,8 +18,12 @@ const mockAttempts: Attempt[] = [
 
 export function SubmissionsGradingPage() {
   const [dark, setDark] = useState(() => window.localStorage.getItem('anticopia-theme') === 'dark')
+  const [attempts, setAttempts] = useState<Attempt[]>(mockAttempts)
   const [notice, setNotice] = useState('')
-  const needsGrading = mockAttempts.some((attempt) => attempt.essayStatus === 'needs_grading')
+  const [gradingAttemptId, setGradingAttemptId] = useState<string | null>(null)
+  const [releaseOpen, setReleaseOpen] = useState(false)
+  const [released, setReleased] = useState(false)
+  const gradingAttempt = attempts.find((attempt) => attempt.id === gradingAttemptId)
 
   function toggleTheme() {
     setDark((current) => {
@@ -26,8 +33,20 @@ export function SubmissionsGradingPage() {
     })
   }
 
-  function releaseGrades() {
-    setNotice('Grades have been released to students.')
+  function saveMarks(attemptId: string, essayMarks: number, feedback: string) {
+    const attempt = attempts.find((item) => item.id === attemptId)
+    setAttempts((current) => current.map((item) => item.id === attemptId
+      ? { ...item, essayStatus: 'graded', essayMarks, feedback }
+      : item))
+    setGradingAttemptId(null)
+    setNotice(`Saved marks for ${attempt?.studentName ?? 'student'}.`)
+  }
+
+  function confirmRelease() {
+    // TODO: call API
+    setReleased(true)
+    setReleaseOpen(false)
+    setNotice('Grades released to students.')
   }
 
   return (
@@ -41,12 +60,11 @@ export function SubmissionsGradingPage() {
           </div>
           <button
             type="button"
-            disabled={needsGrading}
-            title={needsGrading ? 'Grade all essays before releasing grades.' : undefined}
-            onClick={releaseGrades}
+            disabled={released}
+            onClick={() => setReleaseOpen(true)}
             className="min-h-11 rounded-xl bg-[#2d76bf] px-5 text-sm font-semibold text-white transition hover:bg-[#2367ac] focus:outline-none focus:ring-4 focus:ring-[#2d76bf]/25 disabled:cursor-not-allowed disabled:bg-[#9bb9d6] disabled:hover:bg-[#9bb9d6]"
           >
-            Release grades
+            {released ? 'Grades released' : 'Release grades'}
           </button>
         </header>
         {notice && <p role="status" className="mb-5 text-sm text-[#376b4e] dark:text-[#9bd1ae]">{notice}</p>}
@@ -54,9 +72,26 @@ export function SubmissionsGradingPage() {
           <div className="border-b border-[#e7edf4] px-5 py-5 dark:border-[#344964] sm:px-6">
             <h2 id="attempts-heading" className="text-xl font-bold tracking-[-0.025em] text-[#102d4b] dark:text-[#eaf2fb]">Attempts</h2>
           </div>
-          <AttemptsTable attempts={mockAttempts} />
+          <AttemptsTable attempts={attempts} onGrade={setGradingAttemptId} />
         </section>
       </main>
+      {gradingAttempt && (
+        <GradeEssayModal
+          key={gradingAttempt.id}
+          attempt={gradingAttempt}
+          onClose={() => setGradingAttemptId(null)}
+          onSave={saveMarks}
+        />
+      )}
+      <Modal open={releaseOpen} onClose={() => setReleaseOpen(false)} title="Release grades?" titleId="release-grades-title">
+        <div className="mt-5">
+          <p className="text-base text-[#102d4b]">Students will see their scores and feedback.</p>
+          <div className="mt-7 flex flex-col-reverse justify-end gap-3 sm:flex-row">
+            <SecondaryButton type="button" onClick={() => setReleaseOpen(false)}>Cancel</SecondaryButton>
+            <PrimaryButton type="button" onClick={confirmRelease}>Release</PrimaryButton>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

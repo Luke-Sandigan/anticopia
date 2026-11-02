@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { StatusBadge } from './StatusBadge'
 
 export type AttemptStatus = 'submitted' | 'missing' | 'in_progress'
@@ -11,10 +10,13 @@ export interface Attempt {
   autoScore: number | null
   totalPoints: number
   essayStatus: EssayStatus
+  essayMarks?: number
+  feedback?: string
 }
 
 type AttemptsTableProps = {
   attempts: Attempt[]
+  onGrade: (attemptId: string) => void
 }
 
 const attemptStatusLabels: Record<AttemptStatus, string> = {
@@ -28,7 +30,7 @@ const essayStatusLabels: Record<Exclude<EssayStatus, null>, string> = {
   graded: 'Graded',
 }
 
-export function AttemptsTable({ attempts }: AttemptsTableProps) {
+export function AttemptsTable({ attempts, onGrade }: AttemptsTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[700px] border-collapse text-left text-sm">
@@ -58,13 +60,14 @@ export function AttemptsTable({ attempts }: AttemptsTableProps) {
               </td>
               <td className="h-[68px] px-5 text-right">
                 {attempt.essayStatus === 'needs_grading' && (
-                  <Link
-                    to={`/grading/${attempt.id}`}
+                  <button
+                    type="button"
+                    onClick={() => onGrade(attempt.id)}
                     aria-label={`Grade ${attempt.studentName}`}
                     className="inline-flex min-h-9 items-center justify-center rounded-xl bg-[#2d76bf] px-4 text-sm font-semibold text-white transition hover:bg-[#2367ac] focus:outline-none focus:ring-4 focus:ring-[#2d76bf]/25"
                   >
                     Grade
-                  </Link>
+                  </button>
                 )}
               </td>
             </tr>
