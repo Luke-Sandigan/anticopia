@@ -12,6 +12,7 @@ import { TeacherStudentMonitoringPage } from './pages/classification/teacher/Tea
 import { SubmissionsGradingPage } from './pages/teacher/grading/SubmissionsGradingPage'
 import { GradebookPage } from './pages/teacher/gradebook/GradebookPage'
 import { ReportsPage } from './pages/teacher/reports/ReportsPage'
+import { SettingsPage } from './pages/teacher/settings/SettingsPage'
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
       <Route path="/grading" element={<SubmissionsGradingPage />} />
       <Route path="/gradebook" element={<GradebookPage />} />
       <Route path="/reports" element={<ReportsPage />} />
+      <Route path="/settings" element={<SettingsPage />} />
       <Route path="*" element={<Navigate to="/signin" replace />} />
     </Routes>
   )
