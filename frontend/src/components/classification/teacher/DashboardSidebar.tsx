@@ -1,22 +1,34 @@
+import { Link, NavLink } from 'react-router-dom'
+
 const navigation = ['Dashboard', 'Classes', 'Exams', 'Question bank', 'Live monitoring', 'Grading', 'Gradebook', 'Reports', 'Settings']
 type DashboardSidebarProps = { dark: boolean; onToggleTheme: () => void; activePage?: string }
 
-export function DashboardSidebar({ dark, onToggleTheme, activePage = 'Dashboard' }: DashboardSidebarProps) {
-
+export function DashboardSidebar({ dark, onToggleTheme }: DashboardSidebarProps) {
+  const routes: Record<string, string | undefined> = {
+    Dashboard: '/teacher/dashboard',
+    Classes: '/teacher/classes',
+    Exams: '/teacher/exams',
+    'Question bank': '/teacher/question-bank',
+    'Live monitoring': '/teacher/live-monitoring',
+    Grading: '/grading',
+  }
   return (
     <aside className="dashboard-sidebar">
-      <a className="dashboard-brand" href="/teacher/dashboard" aria-label="Anticopia dashboard">
+      <Link className="dashboard-brand" to="/teacher/dashboard" aria-label="Anticopia dashboard">
         <img src="/shield-check.svg" alt="" />
         <span>Anticopia</span>
-      </a>
+      </Link>
       <nav className="dashboard-nav" aria-label="Teacher navigation">
-        {navigation.map((item) => (
-          <a key={item} className={item === activePage ? 'active' : ''} aria-current={item === activePage ? 'page' : undefined} href={item === 'Dashboard' ? '/teacher/dashboard' : item === 'Classes' ? '/teacher/classes' : item === 'Exams' ? '/teacher/exams' : item === 'Question bank' ? '/teacher/question-bank' : item === 'Live monitoring' ? '/teacher/live-monitoring' : item === 'Grading' || item === 'Gradebook' || item === 'Reports' ? '#summary' : '#overview'}>{item}</a>
-        ))}
+        {navigation.map((item) => {
+          const route = routes[item]
+          return route
+            ? <NavLink key={item} to={route} end={item !== 'Classes' && item !== 'Live monitoring'} className={({ isActive }) => isActive ? 'active' : ''}>{item}</NavLink>
+            : <a key={item} href={item === 'Settings' ? '#overview' : '#summary'}>{item}</a>
+        })}
       </nav>
       <div className="dashboard-sidebar-footer">
         <button type="button" onClick={onToggleTheme} aria-pressed={dark}>{dark ? 'Dark mode' : 'Light / dark'}</button>
-        <a href="/signin">Sign out</a>
+        <Link to="/signin">Sign out</Link>
       </div>
     </aside>
   )
