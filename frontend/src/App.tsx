@@ -10,6 +10,7 @@ import { TeacherQuestionBankPage } from './pages/classification/teacher/TeacherQ
 import { TeacherLiveMonitoringPage } from './pages/classification/teacher/TeacherLiveMonitoringPage'
 import { TeacherStudentMonitoringPage } from './pages/classification/teacher/TeacherStudentMonitoringPage'
 import { SubmissionsGradingPage } from './pages/teacher/grading/SubmissionsGradingPage'
+import { GradebookPage } from './pages/teacher/gradebook/GradebookPage'
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
       <Route path="/teacher/live-monitoring" element={<TeacherLiveMonitoringPage />} />
       <Route path="/teacher/live-monitoring/:studentId" element={<TeacherStudentMonitoringPage />} />
       <Route path="/grading" element={<SubmissionsGradingPage />} />
+      <Route path="/gradebook" element={<GradebookPage />} />
       <Route path="*" element={<Navigate to="/signin" replace />} />
     </Routes>
   )

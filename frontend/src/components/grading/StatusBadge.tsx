@@ -1,4 +1,4 @@
-type StatusBadgeTone = 'submitted' | 'graded' | 'needs_grading' | 'in_progress' | 'missing'
+type StatusBadgeTone = 'submitted' | 'graded' | 'needs_grading' | 'in_progress' | 'missing' | 'excused'
 
 type StatusBadgeProps = {
   label: string
@@ -11,6 +11,7 @@ const toneClasses: Record<StatusBadgeTone, string> = {
   needs_grading: 'bg-[#fff1d2] text-[#805500]',
   in_progress: 'bg-[#fff1d2] text-[#805500]',
   missing: 'bg-[#edf1f5] text-[#5f7690]',
+  excused: 'bg-[#eaf3fc] text-[#246db4]',
 }
 
 export function StatusBadge({ label, tone }: StatusBadgeProps) {

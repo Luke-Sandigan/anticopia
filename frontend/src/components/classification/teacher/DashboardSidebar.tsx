@@ -11,6 +11,7 @@ export function DashboardSidebar({ dark, onToggleTheme }: DashboardSidebarProps)
     'Question bank': '/teacher/question-bank',
     'Live monitoring': '/teacher/live-monitoring',
     Grading: '/grading',
+    Gradebook: '/gradebook',
   }
   return (
     <aside className="dashboard-sidebar">
