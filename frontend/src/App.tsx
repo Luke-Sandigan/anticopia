@@ -7,6 +7,7 @@ import { StudentDashboardPage } from './pages/classification/student/StudentDash
 import { StudentClassesPage } from './pages/classification/student/StudentClassesPage'
 import { TeacherClassesPage } from './pages/classification/teacher/TeacherClassesPage'
 import { TeacherClassDetailPage } from './pages/classification/teacher/TeacherClassDetailPage'
+import { StudentExamDetailsPage } from './pages/classification/student/StudentExamDetailsPage'
 import { TeacherExamsPage } from './pages/classification/teacher/TeacherExamsPage'
 import { TeacherQuestionBankPage } from './pages/classification/teacher/TeacherQuestionBankPage'
 import { TeacherLiveMonitoringPage } from './pages/classification/teacher/TeacherLiveMonitoringPage'
@@ -28,6 +29,7 @@ function App() {
       <Route path="/student/classes" element={<StudentClassesPage />} />
       <Route path="/teacher/classes" element={<TeacherClassesPage />} />
       <Route path="/teacher/classes/:classId" element={<TeacherClassDetailPage />} />
+      <Route path="/student/exam-details" element={<StudentExamDetailsPage />} />
       <Route path="/teacher/exams" element={<TeacherExamsPage />} />
       <Route path="/teacher/question-bank" element={<TeacherQuestionBankPage />} />
       <Route path="/teacher/live-monitoring" element={<TeacherLiveMonitoringPage />} />
