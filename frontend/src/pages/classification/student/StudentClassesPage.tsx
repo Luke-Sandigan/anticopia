@@ -34,7 +34,7 @@ export function StudentClassesPage() {
           <NavLink to="/student/classes" className="student-active">
             My classes
           </NavLink>
-          <a href="#exams">Exams</a>
+          <NavLink to="/student/exam-details">Exams</NavLink>
           <a href="#grades">My grades</a>
           <a href="#history">Exam history</a>
           <a href="#settings">Settings</a>

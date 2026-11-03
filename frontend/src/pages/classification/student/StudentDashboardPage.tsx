@@ -25,7 +25,7 @@ export function StudentDashboardPage() {
             Dashboard
           </NavLink>
           <NavLink to="/student/classes">My classes</NavLink>
-          <a href="#available-exams">Exams</a>
+          <NavLink to="/student/exam-details">Exams</NavLink>
           <a href="#announcements">My grades</a>
           <a href="#announcements">Exam history</a>
           <a href="#settings">Settings</a>
