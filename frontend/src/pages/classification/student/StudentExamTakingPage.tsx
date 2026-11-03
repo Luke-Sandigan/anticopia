@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import './StudentDashboardPage.css'
 import './StudentExamTakingPage.css'
+import './StudentSubmissionConfirmation.css'
 
+// Exam Questions
 const questions = [
   {
     question: 'Which structure gives O(1) access by index?',
@@ -23,14 +25,21 @@ const questions = [
 
 export function StudentExamTakingPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0)
+
   const [answers, setAnswers] = useState<(number | null)[]>(
     Array(questions.length).fill(null)
   )
+
   const [timeLeft, setTimeLeft] = useState(90 * 60)
+
   const [activityEvents, setActivityEvents] = useState(0)
+
   const [submitted, setSubmitted] = useState(false)
 
-  // Countdown timer
+  // UI-17: Controls the confirmation popup
+  const [showSubmitModal, setShowSubmitModal] = useState(false)
+
+  // Countdown Timer
   useEffect(() => {
     if (submitted) return
 
@@ -41,7 +50,7 @@ export function StudentExamTakingPage() {
     return () => window.clearInterval(timer)
   }, [submitted])
 
-  // Record when the student switches away from the tab
+  // Browser Tab-Switch Detection
   useEffect(() => {
     if (submitted) return
 
@@ -51,15 +60,23 @@ export function StudentExamTakingPage() {
       }
     }
 
-    document.addEventListener('visibilitychange', handleVisibilityChange)
+    document.addEventListener(
+      'visibilitychange',
+      handleVisibilityChange
+    )
 
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      document.removeEventListener(
+        'visibilitychange',
+        handleVisibilityChange
+      )
     }
   }, [submitted])
 
+  // Current Question
   const current = questions[currentQuestion]
 
+  // Format Timer
   const minutes = Math.floor(timeLeft / 60)
   const seconds = timeLeft % 60
 
@@ -68,6 +85,12 @@ export function StudentExamTakingPage() {
     ':' +
     String(seconds).padStart(2, '0')
 
+  // Count Answered Questions
+  const answeredCount = answers.filter(
+    (answer) => answer !== null
+  ).length
+
+  // Select Answer
   const selectAnswer = (optionIndex: number) => {
     if (submitted || timeLeft === 0) return
 
@@ -78,36 +101,45 @@ export function StudentExamTakingPage() {
     )
   }
 
+  // Open UI-17 Confirmation Popup
   const submitExam = () => {
-    const unanswered = answers.filter((answer) => answer === null).length
+    setShowSubmitModal(true)
+  }
 
-    if (
-      unanswered > 0 &&
-      !window.confirm(
-        `You have ${unanswered} unanswered question(s). Submit anyway?`
-      )
-    ) {
-      return
-    }
-
+  // Confirm Exam Submission
+  const confirmSubmission = () => {
     setSubmitted(true)
+    setShowSubmitModal(false)
+  }
 
-    window.alert(
-      'Exam submitted in this demo. Submission confirmation will be added in UI-17.'
-    )
+  // Cancel Exam Submission
+  const cancelSubmission = () => {
+    setShowSubmitModal(false)
   }
 
   return (
     <div className="student-layout">
+
+      {/* Student Sidebar */}
       <aside className="student-sidebar">
         <h2 className="student-logo">♢ Anticopia</h2>
 
         <nav className="student-navigation">
-          <NavLink to="/student/dashboard">Dashboard</NavLink>
-          <NavLink to="/student/classes">My classes</NavLink>
-          <NavLink to="/student/exam-taking" className="student-active">
+          <NavLink to="/student/dashboard">
+            Dashboard
+          </NavLink>
+
+          <NavLink to="/student/classes">
+            My classes
+          </NavLink>
+
+          <NavLink
+            to="/student/exam-taking"
+            className="student-active"
+          >
             Exams
           </NavLink>
+
           <a href="#grades">My grades</a>
           <a href="#history">Exam history</a>
           <a href="#settings">Settings</a>
@@ -119,42 +151,62 @@ export function StudentExamTakingPage() {
         </div>
       </aside>
 
+      {/* Main Exam Content */}
       <main className="student-main">
+
+        {/* Exam Header */}
         <header className="exam-taking-header">
           <h1>Midterm: Data Structures</h1>
-          <p>Question {currentQuestion + 1} of {questions.length}</p>
+
+          <p>
+            Question {currentQuestion + 1} of {questions.length}
+          </p>
         </header>
 
         <div className="exam-taking-content">
+
+          {/* Question Card */}
           <section className="exam-question-card">
             <h3>{current.question}</h3>
 
+            {/* Multiple Choice Answers */}
             <div className="exam-options">
               {current.options.map((option, index) => (
                 <label
-                  className={`exam-option ${
-                    answers[currentQuestion] === index ? 'selected' : ''
-                  }`}
                   key={option}
+                  className={`exam-option ${
+                    answers[currentQuestion] === index
+                      ? 'selected'
+                      : ''
+                  }`}
                 >
                   <input
                     type="radio"
                     name={`question-${currentQuestion}`}
-                    checked={answers[currentQuestion] === index}
+                    checked={
+                      answers[currentQuestion] === index
+                    }
                     onChange={() => selectAnswer(index)}
                     disabled={submitted || timeLeft === 0}
                   />
+
                   <span>{option}</span>
                 </label>
               ))}
             </div>
 
+            {/* Previous / Next Navigation */}
             <div className="exam-question-footer">
+
               <button
                 type="button"
                 className="exam-nav-button"
                 disabled={currentQuestion === 0}
-                onClick={() => setCurrentQuestion((previous) => previous - 1)}
+                onClick={() =>
+                  setCurrentQuestion(
+                    (previous) => previous - 1
+                  )
+                }
               >
                 Previous
               </button>
@@ -162,24 +214,37 @@ export function StudentExamTakingPage() {
               <button
                 type="button"
                 className="exam-nav-button"
-                disabled={currentQuestion === questions.length - 1}
-                onClick={() => setCurrentQuestion((previous) => previous + 1)}
+                disabled={
+                  currentQuestion === questions.length - 1
+                }
+                onClick={() =>
+                  setCurrentQuestion(
+                    (previous) => previous + 1
+                  )
+                }
               >
                 Next
               </button>
 
               <span>
-                {answers[currentQuestion] === null ? 'Not saved yet' : 'Answer selected'}
+                {answers[currentQuestion] === null
+                  ? 'Not saved yet'
+                  : 'Answer selected'}
               </span>
             </div>
           </section>
 
+          {/* Right Side Panel */}
           <aside className="exam-taking-sidebar">
+
+            {/* Countdown Timer */}
             <section className="exam-timer-card">
               <h3>Time left</h3>
+
               <strong>{formattedTime}</strong>
             </section>
 
+            {/* Question Navigation */}
             <section className="exam-questions-card">
               <h3>Questions</h3>
 
@@ -189,9 +254,13 @@ export function StudentExamTakingPage() {
                     key={index}
                     type="button"
                     className={`exam-number-button ${
-                      currentQuestion === index ? 'current' : ''
+                      currentQuestion === index
+                        ? 'current'
+                        : ''
                     }`}
-                    onClick={() => setCurrentQuestion(index)}
+                    onClick={() =>
+                      setCurrentQuestion(index)
+                    }
                   >
                     {index + 1}
                   </button>
@@ -199,6 +268,7 @@ export function StudentExamTakingPage() {
               </div>
             </section>
 
+            {/* Submit Exam Button */}
             <button
               type="button"
               className="exam-submit-button"
@@ -208,12 +278,65 @@ export function StudentExamTakingPage() {
               {submitted ? 'Submitted' : 'Submit exam'}
             </button>
 
+            {/* Browser Activity Monitoring */}
             <p className="exam-activity-count">
               Activity events recorded: {activityEvents}
             </p>
+
           </aside>
         </div>
       </main>
+
+      {/* UI-17: Submission Confirmation Modal */}
+      {showSubmitModal && (
+        <div
+          className="submission-modal-overlay"
+          onClick={cancelSubmission}
+        >
+          <div
+            className="submission-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="submission-modal-title"
+            onClick={(event) =>
+              event.stopPropagation()
+            }
+          >
+
+            {/* Modal Title */}
+            <h2 id="submission-modal-title">
+              Submit exam?
+            </h2>
+
+            {/* Modal Message */}
+            <p>
+              You answered {answeredCount} of {questions.length}.
+              {' '}You cannot change answers after submitting.
+            </p>
+
+            {/* Modal Buttons */}
+            <div className="submission-modal-actions">
+
+              <button
+                type="button"
+                className="submission-cancel-button"
+                onClick={cancelSubmission}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="submission-confirm-button"
+                onClick={confirmSubmission}
+              >
+                Submit
+              </button>
+
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
