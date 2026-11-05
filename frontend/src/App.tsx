@@ -1,3 +1,4 @@
+import StudentExamResultPage from "./pages/classification/student/StudentExamResultPage";
 import StudentGradesPage from "./pages/classification/student/StudentGradesPage";
 import StudentExamHistoryPage from "./pages/classification/student/StudentExamHistoryPage";
 import { Navigate, Route, Routes } from 'react-router-dom'
