@@ -1,0 +1,320 @@
+
+/* ================================
+   MAIN LAYOUT
+================================ */
+
+.grades-layout {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background: #eaf0f7;
+  color: #243b5a;
+  font-family: Arial, Helvetica, sans-serif;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* ================================
+   SIDEBAR
+================================ */
+
+.grades-sidebar {
+  width: 140px;
+  min-width: 140px;
+  min-height: 100vh;
+  background: #ffffff;
+  border-right: 1px solid #dce4ed;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 2;
+}
+
+.grades-brand {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #17365f;
+  border-bottom: 1px solid #edf0f4;
+}
+
+.grades-logo {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.grades-navigation {
+  display: flex;
+  flex-direction: column;
+  padding: 5px 7px;
+  gap: 2px;
+}
+
+.grades-nav-link {
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 5px 8px;
+  text-decoration: none;
+  color: #60738e;
+  font-size: 9px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.grades-nav-link:hover {
+  background: #f1f5fa;
+  color: #173e72;
+}
+
+.grades-nav-link.active {
+  background: #f0f4f9;
+  color: #173e72;
+  font-weight: 600;
+  border-left: 2px solid #3478d4;
+  padding-left: 6px;
+}
+
+.grades-sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: auto;
+  padding: 10px 8px;
+}
+
+.grades-sidebar-action {
+  display: block;
+  padding: 5px 7px;
+  border: none;
+  background: transparent;
+  text-decoration: none;
+  text-align: left;
+  color: #60738e;
+  font-family: inherit;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.grades-sidebar-action:hover {
+  color: #3478d4;
+}
+
+/* ================================
+   MAIN CONTENT
+================================ */
+
+.grades-main {
+  flex: 1;
+  min-width: 0;
+  padding: 14px;
+}
+
+.grades-header {
+  margin-bottom: 12px;
+}
+
+.grades-header h1 {
+  margin: 0 0 3px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #243b5a;
+}
+
+.grades-header p {
+  margin: 0;
+  font-size: 9px;
+  color: #75869d;
+}
+
+.grades-header strong {
+  font-weight: 500;
+}
+
+/* ================================
+   SCORES CARD
+================================ */
+
+.grades-card {
+  background: #ffffff;
+  border: 1px solid #dce4ed;
+  border-radius: 7px;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.grades-card h2 {
+  margin: 0 0 9px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #243b5a;
+}
+
+/* ================================
+   GRADES TABLE
+================================ */
+
+.grades-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.grades-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 9px;
+  color: #344b6b;
+}
+
+.grades-table th {
+  padding: 7px 6px;
+  font-weight: 500;
+  color: #71839c;
+  border-bottom: 1px solid #dfe6ef;
+  white-space: nowrap;
+}
+
+.grades-table td {
+  padding: 8px 6px;
+  border-bottom: 1px solid #e0e7ef;
+  white-space: nowrap;
+}
+
+.grades-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.grades-table tbody tr:hover {
+  background: #f8fafd;
+}
+
+/* ================================
+   STATUS BADGES
+================================ */
+
+.grades-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 8px;
+  font-weight: 500;
+}
+
+.status-final {
+  color: #247e4a;
+  background: #e0f3e7;
+}
+
+.status-provisional {
+  color: #946300;
+  background: #fff1cf;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ================================
+   DARK MODE
+================================ */
+
+.grades-layout.dark-mode {
+  background: #151e2d;
+  color: #e2eaf5;
+}
+
+.dark-mode .grades-sidebar,
+.dark-mode .grades-card {
+  background: #202c3d;
+  border-color: #344257;
+}
+
+.dark-mode .grades-brand,
+.dark-mode .grades-header h1,
+.dark-mode .grades-card h2 {
+  color: #e2eaf5;
+}
+
+.dark-mode .grades-nav-link,
+.dark-mode .grades-sidebar-action,
+.dark-mode .grades-header p {
+  color: #a7b6ca;
+}
+
+.dark-mode .grades-nav-link.active,
+.dark-mode .grades-nav-link:hover {
+  background: #2c3b50;
+  color: #ffffff;
+}
+
+.dark-mode .grades-table {
+  color: #d5dfed;
+}
+
+.dark-mode .grades-table th {
+  color: #a7b6ca;
+  border-color: #344257;
+}
+
+.dark-mode .grades-table td {
+  border-color: #344257;
+}
+
+.dark-mode .grades-table tbody tr:hover {
+  background: #29374a;
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+================================ */
+
+@media (max-width: 600px) {
+  .grades-sidebar {
+    width: 115px;
+    min-width: 115px;
+  }
+
+  .grades-main {
+    padding: 10px;
+  }
+
+  .grades-card {
+    padding: 8px;
+  }
+
+  .grades-table {
+    min-width: 530px;
+  }
+
+  .grades-header h1 {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 380px) {
+  .grades-sidebar {
+    width: 100px;
+    min-width: 100px;
+  }
+
+  .grades-brand {
+    font-size: 10px;
+  }
+
+  .grades-nav-link {
+    font-size: 8px;
+  }
+}
