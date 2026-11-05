@@ -1,0 +1,424 @@
+
+/* =================================
+   MAIN LAYOUT
+================================= */
+
+.student-settings-layout {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background: #eaf0f7;
+  color: #243b5a;
+  font-family: Arial, Helvetica, sans-serif;
+  transition: background 0.2s ease, color 0.2s ease;
+  box-sizing: border-box;
+}
+
+/* =================================
+   SIDEBAR
+================================= */
+
+.student-settings-sidebar {
+  width: 140px;
+  min-width: 140px;
+  min-height: 100vh;
+  background: #ffffff;
+  border-right: 1px solid #dce4ed;
+  display: flex;
+  flex-direction: column;
+}
+
+.student-settings-brand {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #17365f;
+  border-bottom: 1px solid #edf0f4;
+}
+
+.student-settings-logo {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.student-settings-navigation {
+  display: flex;
+  flex-direction: column;
+  padding: 5px 7px;
+  gap: 2px;
+}
+
+.student-settings-nav-link {
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 5px 8px;
+  text-decoration: none;
+  color: #60738e;
+  font-size: 9px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.student-settings-nav-link:hover {
+  background: #f1f5fa;
+  color: #173e72;
+}
+
+.student-settings-nav-link.active {
+  background: #f0f4f9;
+  color: #173e72;
+  font-weight: 600;
+  border-left: 2px solid #3478d4;
+  padding-left: 6px;
+}
+
+.student-settings-sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: auto;
+  padding: 10px 8px;
+}
+
+.student-settings-sidebar-action {
+  display: block;
+  padding: 5px 7px;
+  border: none;
+  background: transparent;
+  text-decoration: none;
+  text-align: left;
+  color: #60738e;
+  font-family: inherit;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.student-settings-sidebar-action:hover {
+  color: #3478d4;
+}
+
+/* =================================
+   MAIN CONTENT
+================================= */
+
+.student-settings-main {
+  flex: 1;
+  min-width: 0;
+  padding: 14px;
+}
+
+.student-settings-header {
+  margin-bottom: 12px;
+}
+
+.student-settings-header h1 {
+  margin: 0 0 3px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #243b5a;
+}
+
+.student-settings-header p {
+  margin: 0;
+  font-size: 9px;
+  color: #75869d;
+}
+
+/* =================================
+   TWO-COLUMN GRID
+================================= */
+
+.student-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+
+/* =================================
+   SETTINGS CARDS
+================================= */
+
+.student-settings-card {
+  min-width: 0;
+  background: #ffffff;
+  border: 1px solid #dce4ed;
+  border-radius: 7px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.student-settings-card h2 {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #243b5a;
+}
+
+/* =================================
+   FORM FIELDS
+================================= */
+
+.student-settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 9px;
+}
+
+.student-settings-field label {
+  font-size: 9px;
+  color: #344b6b;
+}
+
+.student-settings-field input {
+  width: 100%;
+  height: 28px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  border: 1px solid #dce4ed;
+  border-radius: 7px;
+  background: #f3f7fb;
+  color: #344b6b;
+  font-family: inherit;
+  font-size: 9px;
+  outline: none;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.student-settings-field input:focus {
+  border-color: #3478d4;
+  box-shadow: 0 0 0 2px rgba(52, 120, 212, 0.1);
+}
+
+.student-settings-field input::placeholder {
+  color: #a0aec0;
+}
+
+/* =================================
+   BUTTONS
+================================= */
+
+.student-settings-primary-button,
+.student-settings-secondary-button {
+  width: 100%;
+  min-height: 25px;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 9px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.student-settings-primary-button {
+  border: 1px solid #3478b9;
+  background: #3478b9;
+  color: #ffffff;
+}
+
+.student-settings-primary-button:hover {
+  background: #28649e;
+  border-color: #28649e;
+}
+
+.student-settings-secondary-button {
+  border: 1px solid #dce4ed;
+  background: #ffffff;
+  color: #24466f;
+}
+
+.student-settings-secondary-button:hover {
+  background: #f1f5fa;
+  border-color: #3478d4;
+}
+
+/* =================================
+   NOTIFICATIONS
+================================= */
+
+.student-settings-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.student-settings-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 9px;
+  color: #344b6b;
+  cursor: pointer;
+}
+
+.student-settings-checkbox input {
+  width: 11px;
+  height: 11px;
+  margin: 0;
+  accent-color: #3478b9;
+  cursor: pointer;
+}
+
+/* =================================
+   DEVICE CHECK
+================================= */
+
+.student-settings-description {
+  margin: 0 0 10px;
+  font-size: 8px;
+  line-height: 1.5;
+  color: #75869d;
+}
+
+.student-settings-device-result {
+  margin-top: 9px;
+  padding: 8px;
+  background: #f3f7fb;
+  border: 1px solid #dce4ed;
+  border-radius: 6px;
+  color: #344b6b;
+  font-size: 9px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+/* =================================
+   FEEDBACK MESSAGE
+================================= */
+
+.student-settings-message {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 100;
+  max-width: min(360px, calc(100vw - 36px));
+  padding: 11px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  border: 1px solid #dce4ed;
+  border-radius: 7px;
+  box-shadow: 0 4px 15px rgba(20, 40, 70, 0.1);
+  color: #344b6b;
+  font-size: 10px;
+}
+
+.student-settings-message button {
+  border: none;
+  background: transparent;
+  color: #75869d;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+/* =================================
+   DARK MODE
+================================= */
+
+.student-settings-layout.dark-mode {
+  background: #151e2d;
+  color: #e2eaf5;
+}
+
+.dark-mode .student-settings-sidebar,
+.dark-mode .student-settings-card {
+  background: #202c3d;
+  border-color: #344257;
+}
+
+.dark-mode .student-settings-brand,
+.dark-mode .student-settings-header h1,
+.dark-mode .student-settings-card h2 {
+  color: #e2eaf5;
+}
+
+.dark-mode .student-settings-nav-link,
+.dark-mode .student-settings-sidebar-action,
+.dark-mode .student-settings-header p,
+.dark-mode .student-settings-field label {
+  color: #a7b6ca;
+}
+
+.dark-mode .student-settings-nav-link.active,
+.dark-mode .student-settings-nav-link:hover {
+  background: #2c3b50;
+  color: #ffffff;
+}
+
+.dark-mode .student-settings-field input {
+  background: #29374a;
+  border-color: #45556c;
+  color: #e2eaf5;
+}
+
+.dark-mode .student-settings-checkbox {
+  color: #d5dfed;
+}
+
+.dark-mode .student-settings-description {
+  color: #a7b6ca;
+}
+
+.dark-mode .student-settings-secondary-button {
+  background: #202c3d;
+  border-color: #45556c;
+  color: #e2eaf5;
+}
+
+.dark-mode .student-settings-secondary-button:hover {
+  background: #2c3b50;
+}
+
+.dark-mode .student-settings-device-result {
+  background: #29374a;
+  border-color: #45556c;
+  color: #d5dfed;
+}
+
+.dark-mode .student-settings-message {
+  background: #202c3d;
+  border-color: #45556c;
+  color: #e2eaf5;
+}
+
+/* =================================
+   RESPONSIVE DESIGN
+================================= */
+
+@media (max-width: 700px) {
+  .student-settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .student-settings-sidebar {
+    width: 115px;
+    min-width: 115px;
+  }
+
+  .student-settings-main {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 380px) {
+  .student-settings-sidebar {
+    width: 100px;
+    min-width: 100px;
+  }
+
+  .student-settings-brand {
+    font-size: 10px;
+  }
+
+  .student-settings-nav-link {
+    font-size: 8px;
+  }
+}

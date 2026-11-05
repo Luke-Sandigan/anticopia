@@ -1,3 +1,4 @@
+import StudentSettingsPage from "./pages/classification/student/StudentSettingsPage";
 import StudentExamResultPage from "./pages/classification/student/StudentExamResultPage";
 import StudentGradesPage from "./pages/classification/student/StudentGradesPage";
 import StudentExamHistoryPage from "./pages/classification/student/StudentExamHistoryPage";
