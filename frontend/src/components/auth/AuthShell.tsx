@@ -1,18 +1,11 @@
-import { useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { BrandPanel } from './BrandPanel'
 import { ThemeToggle } from './ThemeToggle'
+import { useAuthShellLogic } from './AuthShell.logic'
 
 type AuthShellProps = { children: ReactNode }
 export function AuthShell({ children }: AuthShellProps) {
-  const [dark, setDark] = useState(() => window.localStorage.getItem('anticopia-theme') === 'dark')
-
-  function toggleTheme() {
-    setDark((value) => {
-      const next = !value
-      window.localStorage.setItem('anticopia-theme', next ? 'dark' : 'light')
-      return next
-    })
-  }
+  const { dark, toggleTheme } = useAuthShellLogic()
 
   return (
     <main className={`auth-shell min-h-screen lg:grid lg:grid-cols-2 ${dark ? 'theme-dark' : ''}`}>

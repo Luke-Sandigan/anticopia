@@ -1,22 +1,14 @@
-import { useState } from 'react'
-import { DashboardSidebar } from '../../../components/classification/teacher/DashboardSidebar'
-import { AccountSecurityCard } from '../../../components/settings/AccountSecurityCard'
-import { ChangePasswordCard } from '../../../components/settings/ChangePasswordCard'
-import { MonitoringPreferencesCard } from '../../../components/settings/MonitoringPreferencesCard'
-import { NotificationPreferencesCard } from '../../../components/settings/NotificationPreferencesCard'
-import { ProfileCard } from '../../../components/settings/ProfileCard'
+import { DashboardSidebar } from '../../../components/teacher/DashboardSidebar'
+import { AccountSecurityCard } from '../../../components/teacher/settings/AccountSecurityCard'
+import { ChangePasswordCard } from '../../../components/teacher/settings/ChangePasswordCard'
+import { MonitoringPreferencesCard } from '../../../components/teacher/settings/MonitoringPreferencesCard'
+import { NotificationPreferencesCard } from '../../../components/teacher/settings/NotificationPreferencesCard'
+import { ProfileCard } from '../../../components/teacher/settings/ProfileCard'
 import { initialProfile } from '../../../data/teacherSettings'
+import { useSettingsPageLogic } from './SettingsPage.logic'
 
 export function SettingsPage() {
-  const [dark, setDark] = useState(() => window.localStorage.getItem('anticopia-theme') === 'dark')
-
-  function toggleTheme() {
-    setDark((current) => {
-      const next = !current
-      window.localStorage.setItem('anticopia-theme', next ? 'dark' : 'light')
-      return next
-    })
-  }
+  const { dark, toggleTheme } = useSettingsPageLogic()
 
   return (
     <div className={`teacher-dashboard !grid-cols-[240px_minmax(0,1fr)] max-[760px]:!grid-cols-1 ${dark ? 'theme-dark dark' : ''}`}>

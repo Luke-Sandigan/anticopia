@@ -1,4 +1,11 @@
-import type { ClassDetails } from '../components/classification/teacher/ClassDialog'
+export type ClassDetails = {
+  id: string
+  name: string
+  section: string
+  subject: string
+  term: string
+  code: string
+}
 
 export const starterClasses: ClassDetails[] = [
   { id: 'it-201', name: 'IT-201 Data Structures', section: 'Section A', subject: 'Computer Science', term: 'Term 1, 2026', code: 'DS-4K9Q' },

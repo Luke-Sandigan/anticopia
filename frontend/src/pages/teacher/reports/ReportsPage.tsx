@@ -1,31 +1,13 @@
-import { useState } from 'react'
-import { DashboardSidebar } from '../../../components/classification/teacher/DashboardSidebar'
-import { AverageRow } from '../../../components/reports/AverageRow'
-import { DistributionChart } from '../../../components/reports/DistributionChart'
-import { ProgressBar } from '../../../components/reports/ProgressBar'
-import { ReportCard } from '../../../components/reports/ReportCard'
-import { SecondaryButton } from '../../../components/ui/Buttons'
-import { assessmentAverages, completion, distributionBuckets } from './mockReportsData'
-
-const reportTypes = ['Grade report', 'Monitoring report', 'Exam activity report']
+import { DashboardSidebar } from '../../../components/teacher/DashboardSidebar'
+import { AverageRow } from '../../../components/teacher/reports/AverageRow'
+import { DistributionChart } from '../../../components/teacher/reports/DistributionChart'
+import { ProgressBar } from '../../../components/teacher/reports/ProgressBar'
+import { ReportCard } from '../../../components/teacher/reports/ReportCard'
+import { SecondaryButton } from '../../../components/shared/Buttons'
+import { assessmentAverages, completion, distributionBuckets, reportTypes, useReportsPageLogic } from './ReportsPage.logic'
 
 export function ReportsPage() {
-  const [dark, setDark] = useState(() => window.localStorage.getItem('anticopia-theme') === 'dark')
-  const [notice, setNotice] = useState('')
-  const completionPercent = completion.total === 0 ? 0 : (completion.submitted / completion.total) * 100
-
-  function toggleTheme() {
-    setDark((current) => {
-      const next = !current
-      window.localStorage.setItem('anticopia-theme', next ? 'dark' : 'light')
-      return next
-    })
-  }
-
-  function prepareReport(reportType: string) {
-    // TODO: call API to generate and download the selected report.
-    setNotice(`${reportType} is being prepared.`)
-  }
+  const { dark, notice, completionPercent, toggleTheme, prepareReport } = useReportsPageLogic()
 
   return (
     <div className={`teacher-dashboard !grid-cols-[240px_minmax(0,1fr)] max-[760px]:!grid-cols-1 ${dark ? 'theme-dark dark' : ''}`}>

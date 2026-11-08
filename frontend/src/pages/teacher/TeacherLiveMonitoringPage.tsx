@@ -1,0 +1,72 @@
+import { Link } from 'react-router-dom'
+import { DashboardSidebar } from '../../components/teacher/DashboardSidebar'
+import { currentStudentStatus, monitoredStudents, roomAlerts } from '../../data/liveMonitoring'
+import { alertClass, statusClass, useTeacherLiveMonitoringPageLogic } from './TeacherLiveMonitoringPage.logic'
+
+export function TeacherLiveMonitoringPage() {
+  const { dark, sessionActive, toggleTheme, endSession } = useTeacherLiveMonitoringPageLogic()
+
+  return (
+    <div className={`teacher-dashboard ${dark ? 'theme-dark' : ''}`}>
+      <DashboardSidebar dark={dark} onToggleTheme={toggleTheme} activePage="Live monitoring" />
+      <main className="dashboard-main monitoring-main">
+        <header className="monitoring-header">
+          <div>
+            <h1>Live monitoring: Midterm</h1>
+            <p>Room 204 · 7 of 8 students connected</p>
+          </div>
+          <button
+            type="button"
+            className="end-session-button"
+            onClick={endSession}
+            disabled={!sessionActive}
+          >
+            {sessionActive ? 'End session' : 'Session ended'}
+          </button>
+        </header>
+
+        <div className="monitoring-layout">
+          <section className="monitoring-students" aria-label="Student monitoring streams">
+            {monitoredStudents.map((student) => {
+              const status = currentStudentStatus(student.events)
+
+              return (
+                <Link className={`student-stream ${statusClass(status)}`} key={student.id} to={`/teacher/live-monitoring/${student.id}`}>
+                  <div className="stream-preview" aria-label={`${student.name} screen preview`}>
+                    {status === 'Offline' ? (
+                      <span>No stream</span>
+                    ) : (
+                      <div className="stream-placeholder" aria-hidden="true">
+                        <i />
+                        <i />
+                        <i />
+                      </div>
+                    )}
+                  </div>
+                  <footer>
+                    <strong>{student.name}</strong>
+                    <span className={`stream-status ${statusClass(status)}`}><i />{status}</span>
+                  </footer>
+                </Link>
+              )
+            })}
+          </section>
+
+          <aside className="dashboard-panel monitoring-alerts" aria-label="Live alerts">
+            <h2>Alerts</h2>
+            <div className="monitoring-alert-list">
+              {roomAlerts.map((alert, index) => (
+                <article className="monitoring-alert" key={`${alert.student}-${alert.time}-${index}`}>
+                  <span className={`monitoring-alert-kind ${alertClass(alert.kind)}`}><i />{alert.kind}</span>
+                  <strong>{alert.student}</strong>
+                  <p>{alert.detail}</p>
+                  <time>{alert.time}</time>
+                </article>
+              ))}
+            </div>
+          </aside>
+        </div>
+      </main>
+    </div>
+  )
+}
