@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import * as controller from '../controllers/class.controller.js';
 import { authenticate } from '../services/auth.service.js';
+import { createExam } from '../controllers/exam.controller.js';
 
 const router = Router();
 router.use(authenticate);
@@ -14,5 +15,6 @@ router.post('/:classId/roster', controller.addStudent);
 router.delete('/:classId/roster/:studentId', controller.removeStudent);
 router.post('/:classId/join-code/regenerate', controller.regenerateCode);
 router.get('/:classId/exams', controller.getExams);
+router.post('/:classId/exams', createExam);
 router.get('/:classId/summary', controller.getSummary);
 export default router;

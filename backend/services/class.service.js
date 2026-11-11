@@ -125,7 +125,7 @@ export async function getExams(classId, user, options) {
   const timing = options.status === 'upcoming' ? { startsAt: { $gt: now } }
     : options.status === 'ongoing' ? { startsAt: { $lte: now }, endsAt: { $gt: now } }
       : options.status === 'past' ? { endsAt: { $lte: now } } : {};
-  return paginated(Exam, { classId, ...(user.role === 'student' ? { published: true } : {}), ...timing,
+  return paginated(Exam, { classId, archivedAt: null, ...(user.role === 'student' ? { published: true } : {}), ...timing,
     ...searchFilter(options.search, ['name']) }, options, { startsAt: 1, examId: 1 },
   (item) => ({ id: item.examId, classId, name: item.name, published: item.published, startsAt: item.startsAt, endsAt: item.endsAt,
     status: item.startsAt > now ? 'upcoming' : item.endsAt > now ? 'ongoing' : 'past' }));
