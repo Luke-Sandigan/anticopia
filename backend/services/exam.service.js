@@ -20,6 +20,7 @@ export function publicExam(item, classItem, user) {
     published: item.published, status: examStatus(item), archivedAt: item.archivedAt ?? null,
     detectTabSwitches: item.detectTabSwitches ?? true, detectMultiDevice: item.detectMultiDevice ?? true,
     captureScreenshots: item.captureScreenshots ?? false, questionCount: item.questions?.length ?? 0,
+    totalPoints: (item.questions ?? []).reduce((total, question) => total + question.points, 0),
     ...(user.role === 'teacher' ? { questions: item.questions ?? [] } : {}),
     createdAt: item.createdAt, updatedAt: item.updatedAt };
 }

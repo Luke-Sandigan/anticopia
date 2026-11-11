@@ -12,6 +12,7 @@ import { Submission } from '../models/submission.model.js';
 import { Grade } from '../models/grade.model.js';
 import { Flag } from '../models/flag.model.js';
 import { accessExam, editExam } from '../services/exam.service.js';
+import { Question } from '../models/question.model.js';
 
 let mongo, server, base, teacher, other, student, outsider;
 const question = { id: 'q-1', topic: 'Trees', type: 'Essay', question: 'Explain a balanced tree.', points: 10 };
@@ -50,7 +51,7 @@ after(async () => {
   await mongo?.stop();
 });
 beforeEach(async () => {
-  await Promise.all([Class, Enrollment, User, Exam, Submission, Grade, Flag].map((model) => model.deleteMany({})));
+  await Promise.all([Class, Enrollment, User, Exam, Submission, Grade, Flag, Question].map((model) => model.deleteMany({})));
   teacher = await register('teacher', 'teacher');
   other = await register('teacher', 'other');
   student = await register('student', 'S-001');
@@ -265,4 +266,143 @@ test('revision guards reject stale updates and submission locks survive record d
   await Submission.deleteMany({ examId: exam.id });
   await assert.rejects(editExam(current, teacher.user, { name: 'After submission' }), { statusCode: 409 });
   assert.equal((await request('PATCH', `/exams/${exam.id}`, teacher.token, { title: 'No' })).status, 409);
+});
+
+const bankInputs = [
+  { text: 'What is 2 + 2?', type: 'multiple_choice', options: ['3', '4'], correctAnswer: '4', points: 2 },
+  { text: 'A stack is LIFO.', type: 'true_false', correctAnswer: true, points: 3 },
+  { text: 'Explain a balanced tree.', type: 'essay', points: 5 },
+];
+async function createBank(input = bankInputs[0], token = teacher.token) {
+  const result = await request('POST', '/questions', token, input);
+  assert.equal(result.status, 201, JSON.stringify(result.body));
+  return result.body.question;
+}
+test('BE-06 creates all three types, filters own questions and searches with pagination', async () => {
+  for (const input of bankInputs) await createBank(input);
+  await createBank(bankInputs[0], other.token);
+  const list = await request('GET', '/questions', teacher.token);
+  assert.equal(list.status, 200);
+  assert.equal(list.body.pagination.total, 3);
+  assert.equal(list.body.questions.find((item) => item.type === 'true_false').correctAnswer, 'True');
+  for (const type of ['multiple_choice', 'true_false', 'essay']) {
+    const filtered = await request('GET', `/questions?type=${type}`, teacher.token);
+    assert.equal(filtered.body.questions.length, 1);
+    assert.equal(filtered.body.questions[0].type, type);
+  }
+  assert.equal((await request('GET', '/questions?search=stack', teacher.token)).body.pagination.total, 1);
+  assert.equal((await request('GET', '/questions?search=.*', teacher.token)).body.pagination.total, 0);
+  assert.deepEqual((await request('GET', '/questions?limit=1&page=2', teacher.token)).body.pagination,
+    { page: 2, limit: 1, total: 3, totalPages: 3 });
+});
+test('BE-06 attaches all three, preserves order on refetch, calculates points and removes one', async () => {
+  const bank = [];
+  for (const input of bankInputs) bank.push(await createBank(input));
+  const exam = await create({ ...window() });
+  const ids = bank.map((item) => item.id);
+  const attached = await request('POST', `/exams/${exam.id}/questions`, teacher.token, { questionIds: ids });
+  assert.equal(attached.status, 200);
+  assert.equal(attached.body.exam.totalPoints, 10);
+  const order = [ids[2], ids[0], ids[1]];
+  assert.equal((await request('PATCH', `/exams/${exam.id}/questions/order`, teacher.token, { questionIds: order })).status, 200);
+  const details = await request('GET', `/exams/${exam.id}`, teacher.token);
+  assert.deepEqual(details.body.exam.questions.map((item) => item.id), order);
+  assert.equal(details.body.exam.totalPoints, 10);
+  await request('POST', `/exams/${exam.id}/publish`, teacher.token);
+  const visible = await request('GET', `/exams/${exam.id}`, student.token);
+  assert.equal(visible.status, 200);
+  assert.equal(visible.body.exam.totalPoints, 10);
+  assert.equal(visible.body.exam.questions, undefined);
+  assert.equal(JSON.stringify(visible.body).includes('correctAnswer'), false);
+  assert.equal(JSON.stringify((await request('GET', '/exams', student.token)).body).includes('correctAnswer'), false);
+  assert.equal(JSON.stringify((await request('GET', '/classes/it-201/exams', student.token)).body).includes('correctAnswer'), false);
+  const removed = await request('DELETE', `/exams/${exam.id}/questions/${ids[0]}`, teacher.token);
+  assert.equal(removed.status, 200);
+  assert.equal(removed.body.exam.totalPoints, 8);
+  assert.equal(removed.body.exam.questionCount, 2);
+});
+test('BE-06 protects every new route with authentication, role and ownership checks', async () => {
+  const bank = await createBank();
+  const exam = await create();
+  const routes = [
+    ['POST', '/questions', bankInputs[0]], ['GET', '/questions'],
+    ['PATCH', `/questions/${bank.id}`, { text: 'Changed' }], ['DELETE', `/questions/${bank.id}`],
+    ['POST', `/exams/${exam.id}/questions`, { questionIds: [bank.id] }],
+    ['DELETE', `/exams/${exam.id}/questions/${bank.id}`],
+    ['PATCH', `/exams/${exam.id}/questions/order`, { questionIds: [bank.id] }],
+  ];
+  for (const [method, path, body] of routes) {
+    assert.equal((await request(method, path, null, body)).status, 401);
+    assert.equal((await request(method, path, student.token, body)).status, 403);
+    if (path !== '/questions') assert.equal((await request(method, path, other.token, body)).status, 403);
+  }
+  const otherQuestion = await createBank(bankInputs[1], other.token);
+  assert.equal((await request('POST', `/exams/${exam.id}/questions`, teacher.token, { questionIds: [bank.id, otherQuestion.id] })).status, 403);
+  assert.equal((await request('GET', `/exams/${exam.id}`, teacher.token)).body.exam.questionCount, 0);
+});
+test('BE-06 bank edits and deletion preserve attached snapshots and totals', async () => {
+  const bank = await createBank();
+  const exam = await create();
+  await request('POST', `/exams/${exam.id}/questions`, teacher.token, { questionIds: [bank.id] });
+  const edited = await request('PATCH', `/questions/${bank.id}`, teacher.token, { text: 'Updated bank question', points: 7 });
+  assert.equal(edited.status, 200);
+  assert.equal(edited.body.question.points, 7);
+  assert.equal((await request('DELETE', `/questions/${bank.id}`, teacher.token)).status, 204);
+  assert.equal((await request('GET', '/questions', teacher.token)).body.pagination.total, 0);
+  assert.equal((await request('PATCH', `/questions/${bank.id}`, teacher.token, { points: 1 })).status, 404);
+  assert.equal((await request('DELETE', `/questions/${bank.id}`, teacher.token)).status, 404);
+  const details = (await request('GET', `/exams/${exam.id}`, teacher.token)).body.exam;
+  assert.equal(details.totalPoints, 2);
+  assert.equal(details.questions[0].question, bankInputs[0].text);
+  const nextExam = await create();
+  assert.equal((await request('POST', `/exams/${nextExam.id}/questions`, teacher.token, { questionIds: [bank.id] })).status, 404);
+});
+test('BE-06 rejects malformed questions, unsupported types and invalid filters', async () => {
+  for (const body of [null, [], {}, { ...bankInputs[0], type: 'short_answer' }, { ...bankInputs[0], text: '' },
+    { ...bankInputs[0], options: ['3'] }, { ...bankInputs[0], options: ['4', '4'] },
+    { ...bankInputs[0], correctAnswer: '5' }, { ...bankInputs[0], points: 0.001 },
+    { ...bankInputs[0], teacherId: other.user.id }, { ...bankInputs[1], correctAnswer: 'maybe' },
+    { ...bankInputs[2], options: ['unexpected'] }]) {
+    assert.equal((await request('POST', '/questions', teacher.token, body)).status, 400, JSON.stringify(body));
+  }
+  for (const query of ['type=short_answer', 'limit=101', 'page=0', 'search[x]=bad', 'type[x]=bad', 'teacherId=other']) {
+    assert.equal((await request('GET', `/questions?${query}`, teacher.token)).status, 400);
+  }
+  assert.equal((await request('PATCH', '/questions/missing', teacher.token, { points: 2 })).status, 404);
+  assert.equal((await request('DELETE', '/questions/missing', teacher.token)).status, 404);
+});
+test('BE-06 builder rejects duplicates, missing questions and incomplete reorder without partial writes', async () => {
+  const bank = await createBank();
+  const exam = await create();
+  const attach = `/exams/${exam.id}/questions`;
+  assert.equal((await request('POST', attach, teacher.token, { questionIds: [bank.id, 'missing'] })).status, 404);
+  for (const body of [{}, { questionIds: [] }, { questionIds: [bank.id, bank.id] }, { questionIds: ['bad id'] }, { questionIds: 'bad' }]) {
+    assert.equal((await request('POST', attach, teacher.token, body)).status, 400);
+  }
+  assert.equal((await request('GET', `/exams/${exam.id}`, teacher.token)).body.exam.totalPoints, 0);
+  assert.equal((await request('POST', attach, teacher.token, { questionIds: [bank.id] })).status, 200);
+  assert.equal((await request('POST', attach, teacher.token, { questionIds: [bank.id] })).status, 409);
+  assert.equal((await request('PATCH', `${attach}/order`, teacher.token, { questionIds: ['missing'] })).status, 400);
+  assert.equal((await request('DELETE', `${attach}/missing`, teacher.token)).status, 404);
+  assert.equal((await request('POST', '/exams/missing/questions', teacher.token, { questionIds: [bank.id] })).status, 404);
+  assert.equal((await request('DELETE', '/exams/missing/questions/abc', teacher.token)).status, 404);
+  assert.equal((await request('PATCH', '/exams/missing/questions/order', teacher.token, { questionIds: [bank.id] })).status, 404);
+});
+test('BE-06 builder honors live, submitted and archived exam locks and the published-question minimum', async () => {
+  const bank = await createBank();
+  const second = await createBank(bankInputs[1]);
+  for (const state of ['live', 'submitted', 'archived']) {
+    const exam = await create({ ...window() });
+    await request('POST', `/exams/${exam.id}/questions`, teacher.token, { questionIds: [bank.id] });
+    if (state === 'live') await Exam.updateOne({ examId: exam.id }, { $set: { published: true, startsAt: new Date(Date.now() - 1000) } });
+    if (state === 'submitted') await Submission.create({ examId: exam.id, studentId: 'S-001' });
+    if (state === 'archived') await request('DELETE', `/exams/${exam.id}`, teacher.token);
+    for (const [method, suffix, body] of [['POST', '', { questionIds: [second.id] }], ['DELETE', `/${bank.id}`], ['PATCH', '/order', { questionIds: [bank.id] }]]) {
+      assert.equal((await request(method, `/exams/${exam.id}/questions${suffix}`, teacher.token, body)).status, 409);
+    }
+  }
+  const scheduled = await create({ ...window() });
+  await request('POST', `/exams/${scheduled.id}/questions`, teacher.token, { questionIds: [bank.id] });
+  await request('POST', `/exams/${scheduled.id}/publish`, teacher.token);
+  assert.equal((await request('DELETE', `/exams/${scheduled.id}/questions/${bank.id}`, teacher.token)).status, 409);
 });

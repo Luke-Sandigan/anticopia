@@ -3,6 +3,7 @@ import authRoutes from './routes/auth.routes.js';
 import classRoutes from './routes/class.routes.js';
 import healthRoutes from './routes/health.routes.js';
 import examRoutes from './routes/exam.routes.js';
+import questionRoutes from './routes/question.routes.js';
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/exams', examRoutes);
+app.use('/api/questions', questionRoutes);
 app.use((_request, response) => response.status(404).json({ error: 'Route not found' }));
 
 app.use((error, _request, response, _next) => {

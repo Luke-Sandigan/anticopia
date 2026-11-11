@@ -21,6 +21,7 @@ export interface ExamDetails {
   detectMultiDevice: boolean;
   captureScreenshots: boolean;
   questionCount: number;
+  totalPoints: number;
   questions?: ExamQuestion[]; // owner details only; absent from lists and student responses
   createdAt: string;
   updatedAt: string;

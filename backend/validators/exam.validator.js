@@ -3,7 +3,7 @@ import { identifier, listOptions, onlyFields } from './class.validator.js';
 
 const fields = ['title', 'description', 'instructions', 'duration', 'passingScore',
   'availableFrom', 'availableUntil', 'detectTabSwitches', 'detectMultiDevice', 'captureScreenshots', 'questions'];
-const questionTypes = ['Multiple choice', 'True/false', 'Short answer', 'Essay'];
+const questionTypes = ['Multiple choice', 'True/false', 'Essay'];
 function text(value, field, max, required = false) {
   if (typeof value !== 'string' || value.trim().length > max || (required && !value.trim())) fail(400, `Invalid ${field}`);
   return value.trim();
@@ -29,7 +29,7 @@ function questions(value) {
     if (ids.has(id)) fail(400, 'Duplicate question id');
     ids.add(id);
     if (!questionTypes.includes(item.type)) fail(400, 'Invalid question type');
-    if (typeof item.points !== 'number' || !Number.isFinite(item.points) || item.points <= 0 || item.points > 10000) fail(400, 'Invalid question points');
+    if (typeof item.points !== 'number' || !Number.isFinite(item.points) || item.points < 0.01 || item.points > 10000) fail(400, 'Invalid question points');
     const result = { id, type: item.type, points: item.points, question: text(item.question, 'question', 10000, true),
       topic: item.topic === undefined ? '' : text(item.topic, 'topic', 200) };
     if (item.choices !== undefined) {
