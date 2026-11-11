@@ -1,39 +1,63 @@
-import { addStudentToRoster, getClassDetails, getRoster, removeStudentFromRoster } from '../services/class.service.js';
-import { validateStudentIdentifier } from '../validators/class.validator.js';
+import { Class } from '../models/class.model.js';
+import * as service from '../services/class.service.js';
+import { identifier, classUpdate, textBody, listOptions } from '../validators/class.validator.js';
 
-function notFound(response) {
-  return response.status(404).json({ error: 'Class not found' });
+async function access(request, write = false) {
+  identifier(request.params.classId, 'classId');
+  return service.accessibleClass(request.params.classId, request.user, write);
 }
-
-async function classExists(classId) {
-  return Boolean(await getClassDetails(classId));
+export async function getClasses(request, response) {
+  const result = await service.getClasses(request.user, listOptions(request.query, ['includeArchived']));
+  return response.json({ classes: result.items, pagination: result.pagination });
 }
-
 export async function getClass(request, response) {
-  const classItem = await getClassDetails(request.params.classId);
-  if (!classItem) return notFound(response);
-  return response.status(200).json({ class: classItem });
+  const item = await access(request);
+  return response.json({ class: await service.getClassDetails(item, request.user) });
 }
-
+export async function updateClass(request, response) {
+  await access(request, true);
+  const update = classUpdate(request.body);
+  const item = await Class.findOneAndUpdate({ classId: request.params.classId, status: { $ne: 'archived' } }, { $set: update }, { new: true, runValidators: true }).lean();
+  if (!item) service.fail(409, 'Class is archived or changed; retry');
+  return response.json({ class: await service.getClassDetails(item, request.user) });
+}
+export async function archiveClass(request, response) {
+  await access(request, true);
+  await Class.updateOne({ classId: request.params.classId }, { $set: { status: 'archived', archivedAt: new Date() } });
+  return response.status(204).end();
+}
 export async function getClassRoster(request, response) {
-  const { classId } = request.params;
-  if (!(await classExists(classId))) return notFound(response);
-  return response.status(200).json({ roster: await getRoster(classId) });
+  service.teacherOnly(request.user);
+  await access(request);
+  const result = await service.getRoster(request.params.classId, listOptions(request.query));
+  return response.json({ roster: result.items, pagination: result.pagination });
 }
-
 export async function addStudent(request, response) {
-  const errors = validateStudentIdentifier(request.body);
-  if (errors.length) return response.status(400).json({ error: 'Validation failed', details: errors });
-  const { classId } = request.params;
-  if (!(await classExists(classId))) return notFound(response);
-  const student = await addStudentToRoster(classId, request.body.identifier);
-  return response.status(201).json({ student });
+  await access(request, true);
+  const value = textBody(request.body, 'identifier', 254);
+  return response.status(201).json({ student: await service.addStudentToRoster(request.params.classId, value) });
 }
-
 export async function removeStudent(request, response) {
-  const { classId, studentId } = request.params;
-  if (!(await classExists(classId))) return notFound(response);
-  const removed = await removeStudentFromRoster(classId, studentId);
-  if (!removed) return response.status(404).json({ error: 'Student is not enrolled in this class' });
-  return response.sendStatus(204);
+  await access(request, true);
+  identifier(request.params.studentId, 'studentId');
+  await service.removeStudentFromRoster(request.params.classId, request.params.studentId);
+  return response.status(204).end();
+}
+export async function regenerateCode(request, response) {
+  await access(request, true);
+  return response.json({ joinCode: await service.regenerateJoinCode(request.params.classId) });
+}
+export async function joinClass(request, response) {
+  const code = textBody(request.body, 'joinCode', 12).toUpperCase();
+  if (!/^[A-F0-9]{12}$/.test(code)) service.fail(400, 'Invalid joinCode');
+  return response.status(201).json(await service.joinClass(code, request.user));
+}
+export async function getExams(request, response) {
+  await access(request);
+  const result = await service.getExams(request.params.classId, request.user, listOptions(request.query, ['status']));
+  return response.json({ exams: result.items, pagination: result.pagination });
+}
+export async function getSummary(request, response) {
+  await access(request);
+  return response.json({ summary: await service.getSummary(request.params.classId, request.user) });
 }

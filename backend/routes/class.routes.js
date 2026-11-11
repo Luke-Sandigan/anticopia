@@ -1,11 +1,18 @@
 import { Router } from 'express';
-import { addStudent, getClass, getClassRoster, removeStudent } from '../controllers/class.controller.js';
+import * as controller from '../controllers/class.controller.js';
+import { authenticate } from '../services/auth.service.js';
 
 const router = Router();
-
-router.get('/:classId', getClass);
-router.get('/:classId/roster', getClassRoster);
-router.post('/:classId/roster', addStudent);
-router.delete('/:classId/roster/:studentId', removeStudent);
-
+router.use(authenticate);
+router.get('/', controller.getClasses);
+router.post('/join', controller.joinClass);
+router.get('/:classId', controller.getClass);
+router.patch('/:classId', controller.updateClass);
+router.delete('/:classId', controller.archiveClass);
+router.get('/:classId/roster', controller.getClassRoster);
+router.post('/:classId/roster', controller.addStudent);
+router.delete('/:classId/roster/:studentId', controller.removeStudent);
+router.post('/:classId/join-code/regenerate', controller.regenerateCode);
+router.get('/:classId/exams', controller.getExams);
+router.get('/:classId/summary', controller.getSummary);
 export default router;

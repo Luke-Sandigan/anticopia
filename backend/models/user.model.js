@@ -1,19 +1,26 @@
-// Temporary in-memory store for the Postman auth ticket. Replace with MongoDB
-// persistence when the database is connected.
-const users = new Map();
+import mongoose from 'mongoose';
+
+const schema = new mongoose.Schema({
+  id: { type: String, required: true, unique: true },
+  role: { type: String, enum: ['teacher', 'student'], required: true },
+  firstName: String, lastName: String,
+  email: { type: String, required: true, unique: true, lowercase: true },
+  employeeId: String, studentId: String, department: String,
+  passwordHash: { salt: String, hash: String },
+}, { timestamps: true, versionKey: false });
+for (const field of ['employeeId', 'studentId']) {
+  schema.index({ [field]: 1 }, { unique: true, partialFilterExpression: { [field]: { $type: 'string' } } });
+}
+export const User = mongoose.model('User', schema);
 
 export function findUserByEmail(email) {
-  return users.get(email.toLowerCase()) ?? null;
+  return User.findOne({ email: email.toLowerCase() }).lean();
 }
 
 export function findUserByIdentifier(field, value) {
-  for (const user of users.values()) {
-    if (user[field]?.toLowerCase() === value.toLowerCase()) return user;
-  }
-  return null;
+  return User.findOne({ [field]: value }).collation({ locale: 'en', strength: 2 }).lean();
 }
 
-export function saveUser(user) {
-  users.set(user.email, user);
-  return user;
+export async function saveUser(user) {
+  return (await User.create(user)).toObject();
 }

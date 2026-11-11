@@ -1,6 +1,7 @@
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function validateRegistration(role, body = {}) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return ['A JSON object is required'];
   const { firstName, lastName, email, password } = body;
   const errors = [];
 
@@ -23,6 +24,7 @@ export function validateRegistration(role, body = {}) {
 }
 
 export function validateLogin(body = {}) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return ['A JSON object is required'];
   const errors = [];
   if (typeof body.email !== 'string' || !emailPattern.test(body.email.trim())) errors.push('A valid email is required');
   if (typeof body.password !== 'string' || !body.password) errors.push('password is required');
