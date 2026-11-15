@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import * as controller from '../controllers/class.controller.js';
+import { getClassAnalytics } from '../controllers/analytics.controller.js';
 import { authenticate } from '../services/auth.service.js';
 import { createExam } from '../controllers/exam.controller.js';
 import { exportGradebook, getGradebook } from '../controllers/gradebook.controller.js';
@@ -10,6 +11,7 @@ router.get('/', controller.getClasses);
 router.post('/join', controller.joinClass);
 router.get('/:classId/gradebook/export', exportGradebook);
 router.get('/:classId/gradebook', getGradebook);
+router.get('/:classId/analytics', getClassAnalytics);
 router.get('/:classId', controller.getClass);
 router.patch('/:classId', controller.updateClass);
 router.delete('/:classId', controller.archiveClass);
