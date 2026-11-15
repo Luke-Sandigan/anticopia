@@ -36,17 +36,32 @@ export async function authenticate(request, _response, next) {
   next();
 }
 
-function publicUser(user) {
-  const { passwordHash: _passwordHash, _id, ...safeUser } = user;
-  return safeUser;
+export function publicUser(user) {
+  return {
+    id: user.id, role: user.role, firstName: user.firstName, lastName: user.lastName,
+    email: user.email, photo: user.photo ?? null,
+    contactInfo: { phone: user.contactInfo?.phone ?? '' },
+    preferences: {
+      notifications: {
+        examUpdatesEmail: user.preferences?.notifications?.examUpdatesEmail ?? true,
+        flaggedEventAlerts: user.preferences?.notifications?.flaggedEventAlerts ?? true,
+      },
+      monitoring: {
+        soundOnAlert: user.preferences?.monitoring?.soundOnAlert ?? true,
+        groupRepeatedEvents: user.preferences?.monitoring?.groupRepeatedEvents ?? true,
+      },
+    },
+    createdAt: user.createdAt,
+    ...(user.role === 'teacher' ? { employeeId: user.employeeId, department: user.department } : { studentId: user.studentId }),
+  };
 }
 
-async function hashPassword(password, salt = randomBytes(16).toString('hex')) {
+export async function hashPassword(password, salt = randomBytes(16).toString('hex')) {
   const derivedKey = await scrypt(password, salt, 64);
   return { salt, hash: derivedKey.toString('hex') };
 }
 
-async function verifyPassword(password, { salt, hash }) {
+export async function verifyPassword(password, { salt, hash }) {
   const expected = Buffer.from(hash, 'hex');
   const actual = await scrypt(password, salt, expected.length);
   return actual.length === expected.length && timingSafeEqual(actual, expected);

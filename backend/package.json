@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "express": "^5.1.0",
-    "mongoose": "^8.20.1"
+    "mongoose": "^8.20.1",
+    "multer": "^2.5.0",
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
     "mongodb-memory-server": "^11.3.0"

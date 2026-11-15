@@ -6,6 +6,8 @@ import examRoutes from './routes/exam.routes.js';
 import questionRoutes from './routes/question.routes.js';
 import submissionRoutes from './routes/submission.routes.js';
 import gradebookRoutes from './routes/gradebook.routes.js';
+import { uploadDirectory } from './services/photo.service.js';
+import { authenticate } from './services/auth.service.js';
 
 const app = express();
 
@@ -24,6 +26,13 @@ app.use((request, response, next) => {
 });
 
 app.use(express.json());
+app.use('/uploads', authenticate, (request, response, next) => {
+  if (request.user.photo !== `uploads${request.path}`) return response.status(404).json({ error: 'Photo not found' });
+  return next();
+}, express.static(uploadDirectory, { dotfiles: 'deny', index: false, setHeaders(response) {
+  response.set('X-Content-Type-Options', 'nosniff');
+  response.set('Cache-Control', 'private, no-store');
+} }));
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classRoutes);
@@ -39,7 +48,7 @@ app.use((error, _request, response, _next) => {
   }
   const status = error.type === 'entity.parse.failed' ? 400 : error.statusCode ?? 500;
   return response.status(status).json({
-    error: status === 500 ? 'Internal server error' : error.message,
+    error: error.type === 'entity.parse.failed' ? 'Invalid JSON body' : status === 500 ? 'Internal server error' : error.message,
     ...(error.details ? { details: error.details } : {}),
   });
 });

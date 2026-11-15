@@ -1,5 +1,9 @@
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+export function validPassword(password) {
+  return typeof password === 'string' && password.length >= 8 && password.length <= 128;
+}
+
 export function validateRegistration(role, body = {}) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return ['A JSON object is required'];
   const { firstName, lastName, email, password } = body;
@@ -8,7 +12,7 @@ export function validateRegistration(role, body = {}) {
   if (typeof firstName !== 'string' || !firstName.trim()) errors.push('firstName is required');
   if (typeof lastName !== 'string' || !lastName.trim()) errors.push('lastName is required');
   if (typeof email !== 'string' || !emailPattern.test(email.trim())) errors.push('A valid email is required');
-  if (typeof password !== 'string' || password.length < 8 || password.length > 128) {
+  if (!validPassword(password)) {
     errors.push('password must be between 8 and 128 characters');
   }
 

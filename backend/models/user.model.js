@@ -6,6 +6,18 @@ const schema = new mongoose.Schema({
   firstName: String, lastName: String,
   email: { type: String, required: true, unique: true, lowercase: true },
   employeeId: String, studentId: String, department: String,
+  photo: { type: String, default: null },
+  contactInfo: { phone: { type: String, default: '' } },
+  preferences: {
+    notifications: {
+      examUpdatesEmail: { type: Boolean, default: true },
+      flaggedEventAlerts: { type: Boolean, default: true },
+    },
+    monitoring: {
+      soundOnAlert: { type: Boolean, default: true },
+      groupRepeatedEvents: { type: Boolean, default: true },
+    },
+  },
   passwordHash: { salt: String, hash: String },
 }, { timestamps: true, versionKey: false });
 for (const field of ['employeeId', 'studentId']) {
