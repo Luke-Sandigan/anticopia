@@ -1,6 +1,6 @@
-import { DashboardSidebar } from '../../components/teacher/DashboardSidebar'
+import { DashboardSidebar } from '../../../components/teacher/DashboardSidebar'
 import { questionTypes, typeClass, useTeacherQuestionBankPageLogic } from './TeacherQuestionBankPage.logic'
-import type { QuestionType } from '../../data/questionBank'
+import type { QuestionType } from '../../../data/questionBank'
 
 export function TeacherQuestionBankPage() {
   const { questions, dark, notice, setNotice, newType, setNewType, newQuestion, setNewQuestion, newTopic, setNewTopic, newPoints, setNewPoints, newCorrectAnswer, setNewCorrectAnswer, randomizeChoices, setRandomizeChoices, toggleTheme, addQuestion, removeQuestion } = useTeacherQuestionBankPageLogic()

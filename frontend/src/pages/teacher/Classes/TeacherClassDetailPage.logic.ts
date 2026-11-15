@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react'
-import { starterClasses, type ClassDetails } from '../../data/teacherClasses'
+import { starterClasses, type ClassDetails } from '../../../data/teacherClasses'
 
 export type Student = { name: string; id: string; enrollment: 'Enrolled'; account: 'Active' | 'Not verified'; performance: number }
 

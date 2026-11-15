@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { starterQuestions, type Question, type QuestionType } from '../../data/questionBank'
+import { starterQuestions, type Question, type QuestionType } from '../../../data/questionBank'
 
 export const questionTypes: QuestionType[] = ['Multiple choice', 'True/false', 'Short answer', 'Essay']
 export function typeClass(type: QuestionType): string {

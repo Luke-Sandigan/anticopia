@@ -1,6 +1,6 @@
 import { Link, useLocation, useParams } from 'react-router-dom'
-import { AddStudentDialog } from '../../components/teacher/AddStudentDialog'
-import { DashboardSidebar } from '../../components/teacher/DashboardSidebar'
+import { AddStudentDialog } from '../../../components/teacher/AddStudentDialog'
+import { DashboardSidebar } from '../../../components/teacher/DashboardSidebar'
 import { classExams, useTeacherClassDetailPageLogic } from './TeacherClassDetailPage.logic'
 
 export function TeacherClassDetailPage() {

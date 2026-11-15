@@ -1,5 +1,5 @@
-import { DashboardSidebar } from '../../components/teacher/DashboardSidebar'
-import { CreateExamDialog } from '../../components/teacher/CreateExamDialog'
+import { DashboardSidebar } from '../../../components/teacher/DashboardSidebar'
+import { CreateExamDialog } from '../../../components/teacher/CreateExamDialog'
 import { statusClass, useTeacherExamsPageLogic } from './TeacherExamsPage.logic'
 
 export function TeacherExamsPage() {

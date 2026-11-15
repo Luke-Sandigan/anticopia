@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import { DashboardSidebar } from '../../components/teacher/DashboardSidebar'
-import { currentStudentStatus, monitoredStudents, roomAlerts } from '../../data/liveMonitoring'
+import { DashboardSidebar } from '../../../components/teacher/DashboardSidebar'
+import { currentStudentStatus, monitoredStudents, roomAlerts } from '../../../data/liveMonitoring'
 import { alertClass, statusClass, useTeacherLiveMonitoringPageLogic } from './TeacherLiveMonitoringPage.logic'
 
 export function TeacherLiveMonitoringPage() {

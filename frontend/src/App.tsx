@@ -1,26 +1,26 @@
-import StudentSettingsPage from "./pages/student/StudentSettingsPage";
-import StudentExamResultPage from "./pages/student/StudentExamResultPage";
-import StudentGradesPage from "./pages/student/StudentGradesPage";
-import StudentExamHistoryPage from "./pages/student/StudentExamHistoryPage";
+import StudentSettingsPage from "./pages/student/Settings/StudentSettingsPage";
+import StudentExamResultPage from "./pages/student/ExamResult/StudentExamResultPage";
+import StudentGradesPage from "./pages/student/Grades/StudentGradesPage";
+import StudentExamHistoryPage from "./pages/student/ExamHistory/StudentExamHistoryPage";
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { SignInPage } from './pages/auth/SignInPage'
-import { TeacherSignUpPage } from './pages/teacher/TeacherSignUpPage'
-import { StudentSignUpPage } from './pages/student/StudentSignUpPage'
-import { TeacherDashboardPage } from './pages/teacher/TeacherDashboardPage'
-import { StudentDashboardPage } from './pages/student/StudentDashboardPage' 
-import { StudentClassesPage } from './pages/student/StudentClassesPage'
-import { TeacherClassesPage } from './pages/teacher/TeacherClassesPage'
-import { TeacherClassDetailPage } from './pages/teacher/TeacherClassDetailPage'
-import { StudentExamDetailsPage } from './pages/student/StudentExamDetailsPage'
-import { TeacherExamsPage } from './pages/teacher/TeacherExamsPage'
-import { TeacherQuestionBankPage } from './pages/teacher/TeacherQuestionBankPage'
-import { TeacherLiveMonitoringPage } from './pages/teacher/TeacherLiveMonitoringPage'
-import { TeacherStudentMonitoringPage } from './pages/teacher/TeacherStudentMonitoringPage'
+import { TeacherSignUpPage } from './pages/teacher/SignUp/TeacherSignUpPage'
+import { StudentSignUpPage } from './pages/student/SignUp/StudentSignUpPage'
+import { TeacherDashboardPage } from './pages/teacher/Dashboard/TeacherDashboardPage'
+import { StudentDashboardPage } from './pages/student/Dashboard/StudentDashboardPage'
+import { StudentClassesPage } from './pages/student/Classes/StudentClassesPage'
+import { TeacherClassesPage } from './pages/teacher/Classes/TeacherClassesPage'
+import { TeacherClassDetailPage } from './pages/teacher/Classes/TeacherClassDetailPage'
+import { StudentExamDetailsPage } from './pages/student/ExamDetails/StudentExamDetailsPage'
+import { TeacherExamsPage } from './pages/teacher/Exams/TeacherExamsPage'
+import { TeacherQuestionBankPage } from './pages/teacher/QuestionBank/TeacherQuestionBankPage'
+import { TeacherLiveMonitoringPage } from './pages/teacher/LiveMonitoring/TeacherLiveMonitoringPage'
+import { TeacherStudentMonitoringPage } from './pages/teacher/StudentMonitoring/TeacherStudentMonitoringPage'
 import { SubmissionsGradingPage } from './pages/teacher/grading/SubmissionsGradingPage'
 import { GradebookPage } from './pages/teacher/gradebook/GradebookPage'
 import { ReportsPage } from './pages/teacher/reports/ReportsPage'
 import { SettingsPage } from './pages/teacher/settings/SettingsPage'
-import { StudentExamTakingPage } from './pages/student/StudentExamTakingPage'
+import { StudentExamTakingPage } from './pages/student/ExamTaking/StudentExamTakingPage'
 
 function App() {
   return (

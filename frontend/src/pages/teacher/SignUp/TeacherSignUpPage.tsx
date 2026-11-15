@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import { AuthShell } from '../../components/auth/AuthShell'
-import { TeacherRegistrationFields } from '../../components/teacher/TeacherRegistrationFields'
+import { AuthShell } from '../../../components/auth/AuthShell'
+import { TeacherRegistrationFields } from '../../../components/teacher/TeacherRegistrationFields'
 import { useTeacherSignUpPageLogic } from './TeacherSignUpPage.logic'
 export function TeacherSignUpPage() {
   const { notice, handleSubmit } = useTeacherSignUpPageLogic()

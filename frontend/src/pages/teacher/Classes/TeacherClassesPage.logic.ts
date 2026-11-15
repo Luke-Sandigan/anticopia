@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
-import { starterClasses, type ClassDetails } from '../../data/teacherClasses'
+import { starterClasses, type ClassDetails } from '../../../data/teacherClasses'
 
 function makeCode() {
   return Math.random().toString(36).slice(2, 6).toUpperCase() + '-' + Math.random().toString(36).slice(2, 4).toUpperCase()

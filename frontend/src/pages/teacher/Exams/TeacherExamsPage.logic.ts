@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import type { ExamFormData } from '../../components/teacher/CreateExamDialog.logic'
-import { starterClasses } from '../../data/teacherClasses'
-import { starterExams, type Exam, type ExamStatus } from '../../data/teacherExams'
+import type { ExamFormData } from '../../../components/teacher/CreateExamDialog.logic'
+import { starterClasses } from '../../../data/teacherClasses'
+import { starterExams, type Exam, type ExamStatus } from '../../../data/teacherExams'
 
 export function statusClass(status: ExamStatus): string {
   switch (status) {

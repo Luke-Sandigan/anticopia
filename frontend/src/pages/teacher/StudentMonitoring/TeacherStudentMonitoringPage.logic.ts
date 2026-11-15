@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import type { MonitoringEventKind } from '../../data/liveMonitoring'
+import type { MonitoringEventKind } from '../../../data/liveMonitoring'
 
 export function eventClass(kind: MonitoringEventKind) {
   if (kind === 'Exam started') return 'started'

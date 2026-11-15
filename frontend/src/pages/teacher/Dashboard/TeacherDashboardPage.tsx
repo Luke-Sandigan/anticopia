@@ -1,9 +1,9 @@
-import { DashboardSidebar } from '../../components/teacher/DashboardSidebar'
-import { DashboardStatCard } from '../../components/teacher/DashboardStatCard'
-import { ExamSummaryPanel } from '../../components/teacher/ExamSummaryPanel'
-import { MyClassesPanel } from '../../components/teacher/MyClassesPanel'
-import { RecentAlertsPanel } from '../../components/teacher/RecentAlertsPanel'
-import { UpcomingExamsPanel } from '../../components/teacher/UpcomingExamsPanel'
+import { DashboardSidebar } from '../../../components/teacher/DashboardSidebar'
+import { DashboardStatCard } from '../../../components/teacher/DashboardStatCard'
+import { ExamSummaryPanel } from '../../../components/teacher/ExamSummaryPanel'
+import { MyClassesPanel } from '../../../components/teacher/MyClassesPanel'
+import { RecentAlertsPanel } from '../../../components/teacher/RecentAlertsPanel'
+import { UpcomingExamsPanel } from '../../../components/teacher/UpcomingExamsPanel'
 import { teacherDashboardStats, useTeacherDashboardPageLogic } from './TeacherDashboardPage.logic'
 
 export function TeacherDashboardPage() {

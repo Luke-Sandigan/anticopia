@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { StudentStatus } from '../../data/liveMonitoring'
+import type { StudentStatus } from '../../../data/liveMonitoring'
 
 export function statusClass(status: StudentStatus) { return status.toLowerCase().replace(' ', '-') }
 export function alertClass(kind: 'Left tab' | 'Copied text') { return kind === 'Copied text' ? 'copied' : 'tab' }

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
-import { ClassDialog } from '../../components/teacher/ClassDialog'
-import { DashboardSidebar } from '../../components/teacher/DashboardSidebar'
+import { ClassDialog } from '../../../components/teacher/ClassDialog'
+import { DashboardSidebar } from '../../../components/teacher/DashboardSidebar'
 import { useTeacherClassesPageLogic } from './TeacherClassesPage.logic'
 
 export function TeacherClassesPage() {

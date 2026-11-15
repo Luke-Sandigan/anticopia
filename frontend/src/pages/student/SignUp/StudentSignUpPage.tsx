@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import { AuthShell } from '../../components/auth/AuthShell'
-import { StudentRegistrationFields } from '../../components/student/StudentRegistrationFields'
+import { AuthShell } from '../../../components/auth/AuthShell'
+import { StudentRegistrationFields } from '../../../components/student/StudentRegistrationFields'
 import { useStudentSignUpPageLogic } from './StudentSignUpPage.logic'
 export function StudentSignUpPage() {
   const { notice, handleSubmit } = useStudentSignUpPageLogic()
