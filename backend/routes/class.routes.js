@@ -2,11 +2,14 @@ import { Router } from 'express';
 import * as controller from '../controllers/class.controller.js';
 import { authenticate } from '../services/auth.service.js';
 import { createExam } from '../controllers/exam.controller.js';
+import { exportGradebook, getGradebook } from '../controllers/gradebook.controller.js';
 
 const router = Router();
 router.use(authenticate);
 router.get('/', controller.getClasses);
 router.post('/join', controller.joinClass);
+router.get('/:classId/gradebook/export', exportGradebook);
+router.get('/:classId/gradebook', getGradebook);
 router.get('/:classId', controller.getClass);
 router.patch('/:classId', controller.updateClass);
 router.delete('/:classId', controller.archiveClass);

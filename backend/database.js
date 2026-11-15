@@ -46,7 +46,7 @@ export async function connectToDatabase() {
   await Class.createIndexes();
   await ensureEnrollmentIndexes();
   await Enrollment.createIndexes();
-  await Promise.all([User.createIndexes(), Exam.createIndexes(), Grade.createIndexes(), Flag.createIndexes(), Submission.createIndexes(), Question.createIndexes()]);
+  await Promise.all([User.createIndexes(), Exam.createIndexes(), Flag.createIndexes(), Question.createIndexes()]);
   // Additive backfill: preserve string class IDs, records and evidence. Legacy
   // owners must be assigned explicitly; never infer an owner from a login.
   await Class.updateMany({ status: { $exists: false } }, { $set: { status: 'active', archivedAt: null } });
@@ -58,5 +58,12 @@ export async function connectToDatabase() {
       updateOne: { filter: { _id: submission._id }, update: { $set: { submissionId: randomUUID() } } },
     })));
   }
+  const legacyGrades = await Grade.find({ gradeId: { $exists: false } }).select('_id').lean();
+  if (legacyGrades.length) {
+    await Grade.bulkWrite(legacyGrades.map((grade) => ({
+      updateOne: { filter: { _id: grade._id }, update: { $set: { gradeId: randomUUID(), overrides: [] } } },
+    })));
+  }
+  await Promise.all([Grade.createIndexes(), Submission.createIndexes()]);
   console.log(`Connected to MongoDB database "${mongoose.connection.name}"`);
 }
