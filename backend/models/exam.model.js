@@ -26,6 +26,7 @@ const schema = new mongoose.Schema({
   startsAt: { type: Date, default: null },
   endsAt: { type: Date, default: null },
   archivedAt: { type: Date, default: null },
+  resultsReleased: { type: Boolean, default: false },
   hasSubmissions: { type: Boolean, default: false },
   revision: { type: Number, default: 0 },
 }, { timestamps: true, versionKey: false });

@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import mongoose from 'mongoose';
 import { Class } from './models/class.model.js';
 import { Enrollment } from './models/enrollment.model.js';
@@ -50,5 +51,12 @@ export async function connectToDatabase() {
   // owners must be assigned explicitly; never infer an owner from a login.
   await Class.updateMany({ status: { $exists: false } }, { $set: { status: 'active', archivedAt: null } });
   await Exam.updateMany({ revision: { $exists: false } }, { $set: { revision: 0 } });
+  await Exam.updateMany({ resultsReleased: { $exists: false } }, { $set: { resultsReleased: false } });
+  const legacySubmissions = await Submission.find({ submissionId: { $exists: false } }).select('_id').lean();
+  if (legacySubmissions.length) {
+    await Submission.bulkWrite(legacySubmissions.map((submission) => ({
+      updateOne: { filter: { _id: submission._id }, update: { $set: { submissionId: randomUUID() } } },
+    })));
+  }
   console.log(`Connected to MongoDB database "${mongoose.connection.name}"`);
 }
