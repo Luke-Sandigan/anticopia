@@ -1,0 +1,140 @@
+{
+  "info": {
+    "name": "ANTICOPIA Teacher Classes (BE-09)",
+    "description": "Create, edit, and archive a teacher-owned class through the API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "teacherFirstName", "value": "Taylor" },
+    { "key": "teacherLastName", "value": "Teacher" },
+    { "key": "teacherEmail", "value": "" },
+    { "key": "teacherPassword", "value": "" },
+    { "key": "employeeId", "value": "" },
+    { "key": "department", "value": "Computer Science" },
+    { "key": "token", "value": "" },
+    { "key": "classId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Register Teacher (optional)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"{{teacherFirstName}}\",\n  \"lastName\": \"{{teacherLastName}}\",\n  \"email\": \"{{teacherEmail}}\",\n  \"password\": \"{{teacherPassword}}\",\n  \"employeeId\": \"{{employeeId}}\",\n  \"department\": \"{{department}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/api/auth/register/teacher"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('Teacher registration succeeds', function () { pm.response.to.have.status(201); });",
+            "const body = pm.response.json();",
+            "if (body.token) pm.collectionVariables.set('token', body.token);"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "Login Teacher",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{teacherEmail}}\",\n  \"password\": \"{{teacherPassword}}\",\n  \"role\": \"teacher\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/api/auth/login"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('Teacher login succeeds', function () { pm.response.to.have.status(200); });",
+            "const body = pm.response.json();",
+            "if (body.token) pm.collectionVariables.set('token', body.token);"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "Create Class",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"BE-09 Test Class\",\n  \"section\": \"Section A\",\n  \"subject\": \"Computer Science\",\n  \"term\": \"Term 1, 2026\",\n  \"schedule\": \"Monday 10:00\",\n  \"description\": \"Created from the BE-09 Postman collection\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/api/classes"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('Class is created', function () { pm.response.to.have.status(201); });",
+            "const body = pm.response.json();",
+            "pm.expect(body.class).to.have.property('id');",
+            "pm.expect(body.class).to.have.property('code');",
+            "pm.collectionVariables.set('classId', body.class.id);"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "Edit Class",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"BE-09 Test Class (Edited)\",\n  \"description\": \"Updated from the BE-09 Postman collection\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/api/classes/{{classId}}"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('Class is updated', function () { pm.response.to.have.status(200); });",
+            "pm.expect(pm.response.json().class.name).to.eql('BE-09 Test Class (Edited)');"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "Archive Class",
+      "request": {
+        "method": "DELETE",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/api/classes/{{classId}}"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('Class is archived', function () { pm.response.to.have.status(204); });"
+          ]
+        }
+      }]
+    }
+  ]
+}

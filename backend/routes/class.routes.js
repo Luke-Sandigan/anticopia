@@ -6,6 +6,7 @@ import { createExam } from '../controllers/exam.controller.js';
 const router = Router();
 router.use(authenticate);
 router.get('/', controller.getClasses);
+router.post('/', controller.createClass);
 router.post('/join', controller.joinClass);
 router.get('/:classId', controller.getClass);
 router.patch('/:classId', controller.updateClass);
