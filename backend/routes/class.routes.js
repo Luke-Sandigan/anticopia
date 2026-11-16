@@ -8,6 +8,7 @@ import { exportGradebook, getGradebook } from '../controllers/gradebook.controll
 const router = Router();
 router.use(authenticate);
 router.get('/', controller.getClasses);
+router.post('/', controller.createClass);
 router.post('/join', controller.joinClass);
 router.get('/:classId/gradebook/export', exportGradebook);
 router.get('/:classId/gradebook', getGradebook);

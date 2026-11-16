@@ -1,6 +1,6 @@
 import { Class } from '../models/class.model.js';
 import * as service from '../services/class.service.js';
-import { identifier, classUpdate, textBody, listOptions } from '../validators/class.validator.js';
+import { identifier, classCreate, classUpdate, textBody, listOptions } from '../validators/class.validator.js';
 
 async function access(request, write = false) {
   identifier(request.params.classId, 'classId');
@@ -9,6 +9,11 @@ async function access(request, write = false) {
 export async function getClasses(request, response) {
   const result = await service.getClasses(request.user, listOptions(request.query, ['includeArchived']));
   return response.json({ classes: result.items, pagination: result.pagination });
+}
+export async function createClass(request, response) {
+  const input = classCreate(request.body);
+  const item = await service.createClass(request.user, input);
+  return response.status(201).json({ class: item });
 }
 export async function getClass(request, response) {
   const item = await access(request);

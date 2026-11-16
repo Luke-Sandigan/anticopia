@@ -17,6 +17,21 @@ export function textBody(body, field, max) {
   if (typeof body[field] !== 'string' || !body[field].trim() || body[field].trim().length > max) fail(400, `Invalid ${field}`);
   return body[field].trim();
 }
+export function classCreate(body) {
+  const limits = { name: 200, section: 100, subject: 200, term: 100, schedule: 500, description: 5000 };
+  onlyFields(body, Object.keys(limits));
+  const required = ['name', 'section', 'subject', 'term'];
+  if (required.some((field) => typeof body[field] !== 'string' || !body[field].trim())) {
+    fail(400, 'name, section, subject and term are required');
+  }
+  const result = {};
+  for (const [field, value] of Object.entries(body)) {
+    if (typeof value !== 'string' || value.trim().length > limits[field]
+      || (!['schedule', 'description'].includes(field) && !value.trim())) fail(400, `Invalid ${field}`);
+    result[field] = value.trim();
+  }
+  return result;
+}
 export function classUpdate(body) {
   const limits = { name: 200, code: 100, section: 100, subject: 200, term: 100, schedule: 500, description: 5000 };
   onlyFields(body, Object.keys(limits));

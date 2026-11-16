@@ -1,4 +1,4 @@
-import { randomBytes } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 import { Class } from '../models/class.model.js';
 import { Enrollment } from '../models/enrollment.model.js';
 import { User, findUserByEmail, findUserByIdentifier } from '../models/user.model.js';
@@ -11,6 +11,20 @@ export function fail(statusCode, message) {
 }
 export function teacherOnly(user) {
   if (user.role !== 'teacher') fail(403, 'Teacher access required');
+}
+export async function createClass(user, input) {
+  teacherOnly(user);
+  const generatedCode = randomBytes(3).toString('hex').toUpperCase();
+  const code = `${generatedCode.slice(0, 4)}-${generatedCode.slice(4)}`;
+  const item = await Class.create({
+    ...input,
+    classId: randomUUID(),
+    teacherId: user.id,
+    code,
+    status: 'active',
+    archivedAt: null,
+  });
+  return getClassDetails(item.toObject(), user);
 }
 export async function accessibleClass(classId, user, write = false) {
   if (write) teacherOnly(user);
