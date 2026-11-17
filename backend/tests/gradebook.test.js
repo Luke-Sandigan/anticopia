@@ -28,6 +28,7 @@ const objective = (id, answer) => ({
   correctAnswer: answer,
 });
 
+
 async function request(method, path, token, body) {
   const response = await fetch(`${base}/api${path}`, {
     method,
@@ -37,8 +38,21 @@ async function request(method, path, token, body) {
     },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
   });
-  return { response, status: response.status, body: response.headers.get('content-type')?.includes('application/json') ? await response.json() : await response.text() };
+
+  const type = response.headers.get('content-type') ?? '';
+  let parsed;
+  if (type.includes('application/json')) {
+    parsed = await response.json();
+  } else if (type.includes('text/csv')) {
+    // read raw bytes: response.text() strips the UTF-8 BOM
+    parsed = Buffer.from(await response.arrayBuffer()).toString('utf8');
+  } else {
+    parsed = await response.text();
+  }
+
+  return { response, status: response.status, body: parsed };
 }
+
 
 async function register(role, suffix) {
   const result = await request('POST', `/auth/register/${role}`, null, {
