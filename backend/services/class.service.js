@@ -108,6 +108,33 @@ export async function addStudentToRoster(classId, identifier) {
   if (!student || student.role !== 'student') fail(404, 'Student account not found');
   return enroll(classId, student);
 }
+export async function importStudentsToRoster(classId, identifiers) {
+  const students = await Promise.all(identifiers.map(async (identifier) => {
+    const user = identifier.includes('@')
+      ? await findUserByEmail(identifier)
+      : await findUserByIdentifier('studentId', identifier);
+    if (!user || user.role !== 'student') fail(404, `Student account not found: ${identifier}`);
+    return user;
+  }));
+  const enrolled = await Enrollment.find({ classId, studentId: { $in: students.map((student) => student.studentId) } })
+    .select('studentId enrollment').lean();
+  const enrollmentByStudentId = new Map(enrolled.map((item) => [item.studentId, item.enrollment]));
+  const results = [];
+  for (const student of students) {
+    if (enrollmentByStudentId.get(student.studentId) === 'Enrolled') {
+      results.push({ id: student.studentId, name: `${student.firstName} ${student.lastName}`, result: 'already_enrolled' });
+      continue;
+    }
+    const addedStudent = await enroll(classId, student);
+    enrollmentByStudentId.set(student.studentId, 'Enrolled');
+    results.push({ ...addedStudent, result: 'added' });
+  }
+  return {
+    addedCount: results.filter((student) => student.result === 'added').length,
+    skippedCount: results.filter((student) => student.result === 'already_enrolled').length,
+    students: results,
+  };
+}
 export async function removeStudentFromRoster(classId, studentId) {
   const now = new Date();
   const result = await Enrollment.updateOne({ classId, studentId, enrollment: 'Enrolled' },

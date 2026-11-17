@@ -46,7 +46,7 @@ app.use((error, _request, response, _next) => {
   if (error?.code === 11000) {
     return response.status(409).json({ error: 'A record with that unique identifier already exists' });
   }
-  const status = error.type === 'entity.parse.failed' ? 400 : error.statusCode ?? 500;
+  const status = error.type === 'entity.parse.failed' ? 400 : error.statusCode ?? error.status ?? 500;
   return response.status(status).json({
     error: error.type === 'entity.parse.failed' ? 'Invalid JSON body' : status === 500 ? 'Internal server error' : error.message,
     ...(error.details ? { details: error.details } : {}),

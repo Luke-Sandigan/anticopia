@@ -10,6 +10,7 @@ All routes below use `/api/classes` and require `Authorization: Bearer <token>` 
 | DELETE | `/:classId` | Owner archives; 204 |
 | GET | `/:classId/roster` | Owner-only active roster; `page`, `limit`, `search` |
 | POST | `/:classId/roster` | Owner adds existing student; `{ identifier: emailOrStudentId }`; 201 |
+| POST | `/:classId/roster/import` | Owner imports existing students from a UTF-8 CSV request body; `text/csv` |
 | DELETE | `/:classId/roster/:studentId` | Owner soft-removes enrollment; 204 |
 | POST | `/join` | Student joins/reactivates; `{ joinCode: string }`; 201 |
 | POST | `/:classId/join-code/regenerate` | Owner rotates code; `{ joinCode: string }` |
@@ -17,6 +18,16 @@ All routes below use `/api/classes` and require `Authorization: Bearer <token>` 
 | GET | `/:classId/summary` | Summary only |
 
 Pagination defaults to page 1 / limit 20, maximum limit 100. Search is case-insensitive literal substring matching: class name/code/section, roster name/student ID/email, and exam name. Unknown list query parameters and edit body properties are rejected. Status is derived from UTC timestamps: upcoming before start, ongoing at/after start and before end, past at/after end. Drafts retain this time status and are visible only to the owner.
+
+The teacher class details route is `GET /api/classes/:classId`. The roster search accepts `GET /api/classes/:classId/roster?search=<name-or-student-id>`. Roster import accepts a CSV body with an `identifier`, `email`, or `studentId` header, for example:
+
+```csv
+studentId
+S-001
+S-002
+```
+
+The import endpoint accepts raw CSV with `Content-Type: text/csv` (up to 1 MB and 500 rows). In Postman, choose **Body → binary** and select a `.csv` file, then set the content type to `text/csv`; a raw text body also works. Each identifier must match an existing student account. The complete file is parsed and all accounts are checked before any enrollment changes. Existing active enrollments are reported as skipped; removed enrollments are reactivated. The response reports `addedCount`, `skippedCount`, and a per-student result.
 
 ## Frontend contracts
 
