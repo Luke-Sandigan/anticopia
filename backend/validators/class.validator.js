@@ -43,6 +43,52 @@ export function classUpdate(body) {
   }
   return result;
 }
+function parseCsvRecords(text) {
+  const rows = [];
+  let row = [];
+  let value = '';
+  let quoted = false;
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index];
+    if (quoted) {
+      if (character === '"' && text[index + 1] === '"') { value += '"'; index += 1; }
+      else if (character === '"') quoted = false;
+      else value += character;
+    } else if (character === '"' && value.length === 0) quoted = true;
+    else if (character === ',') { row.push(value.trim()); value = ''; }
+    else if (character === '\n' || character === '\r') {
+      if (character === '\r' && text[index + 1] === '\n') index += 1;
+      row.push(value.trim());
+      if (row.some(Boolean)) rows.push(row);
+      row = []; value = '';
+    } else value += character;
+  }
+  if (quoted) fail(400, 'CSV contains an unclosed quoted field');
+  row.push(value.trim());
+  if (row.some(Boolean)) rows.push(row);
+  return rows;
+}
+export function rosterCsv(body) {
+  if (typeof body !== 'string' || !body.trim()) fail(400, 'A non-empty CSV file is required');
+  const rows = parseCsvRecords(body.replace(/^\uFEFF/, ''));
+  if (rows.length < 2) fail(400, 'CSV must contain a header and at least one student');
+  const headers = rows[0].map((header) => header.trim().toLowerCase().replace(/[\s_-]/g, ''));
+  const identifierIndex = headers.indexOf('identifier');
+  const emailIndex = headers.indexOf('email');
+  const studentIdIndex = headers.indexOf('studentid');
+  if (identifierIndex < 0 && emailIndex < 0 && studentIdIndex < 0) {
+    fail(400, 'CSV needs an identifier, email, or studentId column');
+  }
+  const identifiers = rows.slice(1).map((row, rowIndex) => {
+    const value = row[identifierIndex] || row[emailIndex] || row[studentIdIndex];
+    if (!value) fail(400, `CSV row ${rowIndex + 2} has no student identifier`);
+    return value.trim();
+  });
+  if (identifiers.length > 500) fail(400, 'CSV may contain at most 500 students');
+  const keys = identifiers.map((value) => value.toLowerCase());
+  if (new Set(keys).size !== keys.length) fail(400, 'CSV contains duplicate student identifiers');
+  return identifiers;
+}
 export function listOptions(query, extras = []) {
   if (Object.keys(query).some((key) => !['page', 'limit', 'search', ...extras].includes(key))) fail(400, 'Unknown query parameter');
   const result = { page: 1, limit: 20, search: '' };

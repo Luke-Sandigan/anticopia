@@ -1,0 +1,177 @@
+{
+  "info": {
+    "name": "ANTICOPIA Teacher Class Details and Roster",
+    "description": "Test teacher class details, roster listing/search, add student, and CSV roster import.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "teacherEmail", "value": "" },
+    { "key": "teacherPassword", "value": "" },
+    { "key": "token", "value": "" },
+    { "key": "classId", "value": "" },
+    { "key": "studentIdentifier", "value": "" },
+    { "key": "search", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Login Teacher",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{teacherEmail}}\",\n  \"password\": \"{{teacherPassword}}\",\n  \"role\": \"teacher\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/api/auth/login"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('Teacher login succeeds', function () { pm.response.to.have.status(200); });",
+            "const body = pm.response.json();",
+            "if (body.token) pm.collectionVariables.set('token', body.token);"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "Create Test Class (optional)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Roster API Test Class\",\n  \"section\": \"A\",\n  \"subject\": \"Computer Science\",\n  \"term\": \"2026\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/api/classes"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('Test class is created', function () { pm.response.to.have.status(201); });",
+            "const body = pm.response.json();",
+            "if (body.class?.id) pm.collectionVariables.set('classId', body.class.id);"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "Get Class Details (open class)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/api/classes/{{classId}}"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('Class details load', function () { pm.response.to.have.status(200); });",
+            "pm.expect(pm.response.json().class).to.have.property('summary');"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "List Roster",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/api/classes/{{classId}}/roster"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('Roster list loads', function () { pm.response.to.have.status(200); });",
+            "pm.expect(pm.response.json().roster).to.be.an('array');"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "Add Student by Email or Student ID",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"identifier\": \"{{studentIdentifier}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/api/classes/{{classId}}/roster"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('Student is added', function () { pm.response.to.have.status(201); });",
+            "pm.expect(pm.response.json().student).to.have.property('id');"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "Search Roster",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/api/classes/{{classId}}/roster?search={{search}}"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('Roster search succeeds', function () { pm.response.to.have.status(200); });",
+            "pm.expect(pm.response.json().roster).to.be.an('array');"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "Import Roster CSV",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "text/csv" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "identifier\n{{studentIdentifier}}",
+          "options": { "raw": { "language": "text" } }
+        },
+        "url": "{{baseUrl}}/api/classes/{{classId}}/roster/import"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('Roster import succeeds', function () { pm.expect([200, 201]).to.include(pm.response.code); });",
+            "const body = pm.response.json();",
+            "pm.expect(body.addedCount).to.be.a('number');",
+            "pm.expect(body.skippedCount).to.be.a('number');"
+          ]
+        }
+      }]
+    }
+  ]
+}

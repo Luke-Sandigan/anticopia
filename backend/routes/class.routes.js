@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as controller from '../controllers/class.controller.js';
 import { authenticate } from '../services/auth.service.js';
 import { createExam } from '../controllers/exam.controller.js';
+import express from 'express';
 
 const router = Router();
 router.use(authenticate);
@@ -13,6 +14,7 @@ router.patch('/:classId', controller.updateClass);
 router.delete('/:classId', controller.archiveClass);
 router.get('/:classId/roster', controller.getClassRoster);
 router.post('/:classId/roster', controller.addStudent);
+router.post('/:classId/roster/import', express.text({ type: ['text/csv', 'text/plain'], limit: '1mb' }), controller.importRoster);
 router.delete('/:classId/roster/:studentId', controller.removeStudent);
 router.post('/:classId/join-code/regenerate', controller.regenerateCode);
 router.get('/:classId/exams', controller.getExams);

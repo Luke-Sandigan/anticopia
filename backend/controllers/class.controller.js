@@ -1,6 +1,6 @@
 import { Class } from '../models/class.model.js';
 import * as service from '../services/class.service.js';
-import { identifier, classCreate, classUpdate, textBody, listOptions } from '../validators/class.validator.js';
+import { identifier, classCreate, classUpdate, textBody, rosterCsv, listOptions } from '../validators/class.validator.js';
 
 async function access(request, write = false) {
   identifier(request.params.classId, 'classId');
@@ -41,6 +41,12 @@ export async function addStudent(request, response) {
   await access(request, true);
   const value = textBody(request.body, 'identifier', 254);
   return response.status(201).json({ student: await service.addStudentToRoster(request.params.classId, value) });
+}
+export async function importRoster(request, response) {
+  await access(request, true);
+  const identifiers = rosterCsv(request.body);
+  const result = await service.importStudentsToRoster(request.params.classId, identifiers);
+  return response.status(result.addedCount ? 201 : 200).json(result);
 }
 export async function removeStudent(request, response) {
   await access(request, true);
