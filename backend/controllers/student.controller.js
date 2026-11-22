@@ -3,16 +3,19 @@ import { Enrollment } from '../models/enrollment.model.js';
 import { Class } from '../models/class.model.js';
 import { Exam } from '../models/exam.model.js';
 import { Grade } from '../models/grade.model.js';
+import { Submission } from '../models/submission.model.js';
 import * as classService from '../services/class.service.js';
 
-// Shared student role check
+// ==========================================
+// SHARED HELPERS
+// ==========================================
+
 function studentOnly(user) {
   if (user.role !== 'student') {
     classService.fail(403, 'Student access required');
   }
 }
 
-// Convert exam to student-safe response
 function publicExam(exam) {
   return {
     examId: exam.examId,
@@ -25,7 +28,6 @@ function publicExam(exam) {
   };
 }
 
-// Convert class to student-safe response
 function publicClass(item) {
   return {
     classId: item.classId,
@@ -43,20 +45,17 @@ function publicClass(item) {
 // BE-14: STUDENT DASHBOARD
 // GET /api/student/dashboard
 // ==========================================
+
 export async function getDashboard(req, res) {
   studentOnly(req.user);
 
   const student = req.user;
   const now = new Date();
 
-  const enrollments = await Enrollment.find({
+  const classIds = await Enrollment.distinct('classId', {
     userId: student.id,
     enrollment: 'Enrolled'
-  }).select('classId').lean();
-
-  const classIds = [...new Set(
-    enrollments.map(item => item.classId)
-  )];
+  });
 
   const classes = await Class.find({
     classId: { $in: classIds },
@@ -84,12 +83,11 @@ export async function getDashboard(req, res) {
       new Date(a.startsAt) - new Date(b.startsAt)
     );
 
-  const ongoingExams = exams
-    .filter(exam =>
-      exam.startsAt &&
-      new Date(exam.startsAt) <= now &&
-      (!exam.endsAt || new Date(exam.endsAt) > now)
-    );
+  const ongoingExams = exams.filter(exam =>
+    exam.startsAt &&
+    new Date(exam.startsAt) <= now &&
+    (!exam.endsAt || new Date(exam.endsAt) > now)
+  );
 
   const releasedExamIds = exams
     .filter(exam => exam.resultsReleased === true)
@@ -126,6 +124,7 @@ export async function getDashboard(req, res) {
 // BE-15: STUDENT MY CLASSES
 // GET /api/student/classes
 // ==========================================
+
 export async function getStudentClasses(req, res) {
   studentOnly(req.user);
 
@@ -147,8 +146,10 @@ export async function getStudentClasses(req, res) {
 }
 
 // ==========================================
+// BE-15: STUDENT CLASS DETAILS
 // GET /api/student/classes/:classId
 // ==========================================
+
 export async function getStudentClassDetails(req, res) {
   studentOnly(req.user);
 
@@ -191,8 +192,10 @@ export async function getStudentClassDetails(req, res) {
 }
 
 // ==========================================
+// BE-15: LEAVE STUDENT CLASS
 // POST /api/student/classes/:classId/leave
 // ==========================================
+
 export async function leaveStudentClass(req, res) {
   studentOnly(req.user);
 
@@ -220,12 +223,113 @@ export async function leaveStudentClass(req, res) {
   );
 
   if (!enrollment) {
-    classService.fail(
-      404,
-      'Active enrollment not found'
-    );
+    classService.fail(404, 'Active enrollment not found');
   }
 
-  // Do not delete grades or enrollment history.
+  // Preserve enrollment history and previous grades.
   return res.status(204).end();
+}
+
+// ==========================================
+// BE-16: EXAM DETAILS AND INSTRUCTIONS
+// GET /api/student/exams/:examId
+// ==========================================
+
+export async function getStudentExamDetails(req, res) {
+  studentOnly(req.user);
+
+  const { examId } = req.params;
+  const student = req.user;
+  const now = new Date();
+
+  // Find the requested published and non-archived exam.
+  // Project only the fields required for student details.
+  const exam = await Exam.findOne({
+    examId,
+    published: true,
+    archivedAt: null
+  })
+    .select(
+      'examId classId name instructions duration ' +
+      'startsAt endsAt detectTabSwitches ' +
+      'detectMultiDevice captureScreenshots questions.id'
+    )
+    .lean();
+
+  if (!exam) {
+    classService.fail(404, 'Exam not found');
+  }
+
+  // Only actively enrolled students can view details.
+  const enrolled = await Enrollment.exists({
+    classId: exam.classId,
+    userId: student.id,
+    enrollment: 'Enrolled'
+  });
+
+  if (!enrolled) {
+    classService.fail(403, 'You are not enrolled in this class');
+  }
+
+  const activeClass = await Class.exists({
+    classId: exam.classId,
+    status: 'active'
+  });
+
+  if (!activeClass) {
+    classService.fail(404, 'Class is not available');
+  }
+
+  // Find this student's existing attempt.
+  const attempt = await Submission.findOne({
+    examId: exam.examId,
+    studentId: student.studentId
+  })
+    .select('submissionId status')
+    .lean();
+
+  // Calculate the availability window on the server.
+  const startsAt = exam.startsAt
+    ? new Date(exam.startsAt)
+    : null;
+
+  const endsAt = exam.endsAt
+    ? new Date(exam.endsAt)
+    : null;
+
+  const withinWindow = Boolean(
+    startsAt &&
+    endsAt &&
+    startsAt <= now &&
+    now < endsAt
+  );
+
+  // A new attempt is allowed only during the
+  // exam window and when no attempt exists.
+  const canStart = withinWindow && !attempt;
+
+  return res.json({
+    exam: {
+      examId: exam.examId,
+      classId: exam.classId,
+
+      title: exam.name,
+      instructions: exam.instructions ?? '',
+      duration: exam.duration,
+
+      startsAt: exam.startsAt,
+      endsAt: exam.endsAt,
+
+      questionCount: exam.questions?.length ?? 0,
+
+      monitoringRules: {
+        tabSwitching: exam.detectTabSwitches ?? true,
+        multiDevice: exam.detectMultiDevice ?? true,
+        screenshots: exam.captureScreenshots ?? false
+      },
+
+      attemptStatus: attempt?.status ?? null,
+      canStart
+    }
+  });
 }

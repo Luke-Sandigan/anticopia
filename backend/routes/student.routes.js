@@ -5,7 +5,8 @@ import {
   getDashboard,
   getStudentClasses,
   getStudentClassDetails,
-  leaveStudentClass
+  leaveStudentClass,
+  getStudentExamDetails
 } from '../controllers/student.controller.js';
 
 const router = Router();
@@ -19,5 +20,8 @@ router.get('/dashboard', getDashboard);
 router.get('/classes', getStudentClasses);
 router.get('/classes/:classId', getStudentClassDetails);
 router.post('/classes/:classId/leave', leaveStudentClass);
+
+// BE-16: Student Exam Details
+router.get('/exams/:examId', getStudentExamDetails);
 
 export default router;
