@@ -6,6 +6,8 @@ const schema = new mongoose.Schema({
   firstName: String, lastName: String,
   email: { type: String, required: true, unique: true, lowercase: true },
   employeeId: String, studentId: String, department: String,
+  program: { type: String, default: '' },
+  yearLevel: { type: String, default: '' },
   photo: { type: String, default: null },
   contactInfo: { phone: { type: String, default: '' } },
   preferences: {

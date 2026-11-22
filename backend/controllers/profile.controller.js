@@ -14,10 +14,29 @@ export function getProfile(request, response) {
   return response.json({ user: publicUser(request.user) });
 }
 
+
 export async function patchProfile(request, response) {
+  if (
+    request.user.role === 'student' &&
+    'email' in request.body
+  ) {
+    const error = new Error(
+      'Students cannot change their email address'
+    );
+    error.statusCode = 403;
+    throw error;
+  }
+
   rejectInvalid(validateProfile(request.body));
-  return response.json({ user: await updateProfile(request.user.id, request.body) });
+
+  return response.json({
+    user: await updateProfile(
+      request.user.id,
+      request.body
+    )
+  });
 }
+
 
 export async function postPassword(request, response) {
   rejectInvalid(validatePasswordChange(request.body));

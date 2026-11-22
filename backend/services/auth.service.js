@@ -52,7 +52,7 @@ export function publicUser(user) {
       },
     },
     createdAt: user.createdAt,
-    ...(user.role === 'teacher' ? { employeeId: user.employeeId, department: user.department } : { studentId: user.studentId }),
+    ...(user.role === 'teacher' ? { employeeId: user.employeeId, department: user.department } : { studentId: user.studentId, program: user.program ?? '', yearLevel: user.yearLevel ?? ''}),
   };
 }
 

@@ -1,3 +1,4 @@
+import meRoutes from './routes/me.routes.js';
 import attemptRoutes from './routes/attempt.routes.js';
 import studentRoutes from './routes/student.routes.js';
 import express from 'express';
@@ -44,6 +45,7 @@ app.use('/api/submissions', submissionRoutes);
 app.use('/api/gradebook', gradebookRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/attempts', attemptRoutes);
+app.use('/api/me', meRoutes);
 app.use((_request, response) => response.status(404).json({ error: 'Route not found' }));
 
 app.use((error, _request, response, _next) => {
