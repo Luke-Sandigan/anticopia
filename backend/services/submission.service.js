@@ -141,7 +141,7 @@ export async function getSubmission(id, user) {
     submission: {
       ...studentSummary(submission, exam, null),
       released: true,
-      answers: submission.answers.map((answer) => answerView(answer, questions.get(answer.questionId), false)),
+      answers: submission.answers.map((answer) => answerView(answer, questions.get(answer.questionId), Boolean(exam.showCorrectAnswers))),
     },
   };
 }

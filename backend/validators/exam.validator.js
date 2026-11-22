@@ -2,7 +2,7 @@ import { fail } from '../services/class.service.js';
 import { identifier, listOptions, onlyFields } from './class.validator.js';
 
 const fields = ['title', 'description', 'instructions', 'duration', 'passingScore',
-  'availableFrom', 'availableUntil', 'detectTabSwitches', 'detectMultiDevice', 'captureScreenshots', 'questions'];
+  'availableFrom', 'availableUntil', 'detectTabSwitches', 'detectMultiDevice', 'captureScreenshots', 'showCorrectAnswers', 'questions'];
 const questionTypes = ['Multiple choice', 'True/false', 'Essay'];
 function text(value, field, max, required = false) {
   if (typeof value !== 'string' || value.trim().length > max || (required && !value.trim())) fail(400, `Invalid ${field}`);

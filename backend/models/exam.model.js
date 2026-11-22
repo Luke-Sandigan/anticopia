@@ -27,8 +27,11 @@ const schema = new mongoose.Schema({
   endsAt: { type: Date, default: null },
   archivedAt: { type: Date, default: null },
   resultsReleased: { type: Boolean, default: false },
+  showCorrectAnswers: { type: Boolean, default: false},
   hasSubmissions: { type: Boolean, default: false },
   revision: { type: Number, default: 0 },
 }, { timestamps: true, versionKey: false });
 schema.index({ classId: 1, archivedAt: 1, published: 1, startsAt: 1 });
 export const Exam = mongoose.model('Exam', schema);
+
+
