@@ -1,4 +1,4 @@
-
+import { User } from '../models/user.model.js';
 import { Grade } from '../models/grade.model.js';
 import { Exam } from '../models/exam.model.js';
 import { Class } from '../models/class.model.js';
@@ -111,5 +111,110 @@ export async function getStudentGrades(user, classId) {
     classes: Object.values(grouped),
     overallAverage: average,
     totalGrades: values.length
+  };
+}
+
+
+export async function getExamHistory(user, filters = {}) {
+  if (user.role !== 'student') {
+    fail(403, 'Student access required');
+  }
+
+  const page = Math.max(1, Number.parseInt(filters.page, 10) || 1);
+  const limit = 10;
+
+  const enrollments = await Enrollment.find({
+    userId: user.id,
+    enrollment: 'Enrolled'
+  }).select('classId').lean();
+
+  const classIds = enrollments.map(e => e.classId);
+
+  if (filters.classId && !classIds.includes(filters.classId)) {
+    fail(403, 'You are not enrolled in this class');
+  }
+
+  const exams = await Exam.find({
+    classId: filters.classId
+      ? filters.classId
+      : { $in: classIds },
+    archivedAt: null
+  }).lean();
+
+  const examIds = exams.map(e => e.examId);
+
+  const filter = {
+    studentId: user.studentId,
+    examId: { $in: examIds },
+    status: { $in: ['submitted', 'needs_grading', 'graded'] }
+  };
+
+  if (filters.status) {
+    if (!['submitted', 'needs_grading', 'graded'].includes(filters.status)) {
+      fail(400, 'Invalid status filter');
+    }
+    filter.status = filters.status;
+  }
+
+  const [attempts, total] = await Promise.all([
+    Submission.find(filter)
+      .sort({ submittedAt: -1, createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean(),
+
+    Submission.countDocuments(filter)
+  ]);
+
+  const examMap = new Map(
+    exams.map(e => [e.examId, e])
+  );
+
+  const grades = await Grade.find({
+    examId: { $in: attempts.map(a => a.examId) },
+    studentId: user.studentId,
+    released: true
+  }).lean();
+
+  const gradeMap = new Map(
+    grades.map(g => [g.examId, g])
+  );
+
+  const classItems = await Class.find({
+    classId: { $in: classIds }
+  }).lean();
+
+  const classMap = new Map(
+    classItems.map(c => [c.classId, c])
+  );
+
+  return {
+    attempts: attempts.map(attempt => {
+      const exam = examMap.get(attempt.examId);
+      const grade = gradeMap.get(attempt.examId);
+      const classItem = classMap.get(exam?.classId);
+
+      return {
+        attemptId: attempt.submissionId,
+        examTitle: exam?.name ?? 'Unknown exam',
+        classId: exam?.classId,
+        className: classItem?.name ?? 'Unknown class',
+        dateTaken: attempt.submittedAt ?? attempt.createdAt,
+        status: attempt.status,
+        score: grade
+          ? grade.percentage
+          : null,
+        scoreStatus: grade
+          ? 'released'
+          : 'pending'
+      };
+    }),
+
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit)
+    }
   };
 }

@@ -10,3 +10,13 @@ export async function getGrades(request, response) {
 
   return response.json(result);
 }
+
+
+export async function getExamHistory(request, response) {
+  const result = await service.getExamHistory(
+    request.user,
+    request.query
+  );
+
+  return response.json(result);
+}
