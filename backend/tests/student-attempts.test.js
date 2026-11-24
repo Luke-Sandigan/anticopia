@@ -632,3 +632,161 @@ test('simultaneous autosave and submission preserve finalized answers', async ()
     savedAnswer.response
   );
 });
+
+// ==========================================
+// BE-18: SUBMISSION CONFIRMATION TESTS
+// ==========================================
+
+async function confirmation(attemptId, token = student.token) {
+  return request(
+    'GET',
+    `/attempts/${attemptId}/confirmation`,
+    token
+  );
+}
+
+// TEST 1: Answered questions are counted correctly.
+test('BE-18: confirmation counts answered questions', async () => {
+  await createExam();
+
+  const started = await start();
+  assert.equal(started.status, 201);
+
+  const id = started.body.attemptId;
+
+  // The exam has two questions, but only one is answered.
+  assert.equal((await save(id, 'q-1', '4')).status, 200);
+  assert.equal((await submit(id)).status, 200);
+
+  const result = await confirmation(id);
+
+  assert.equal(result.status, 200);
+  assert.equal(result.body.confirmation.questionsAnswered, 1);
+  assert.equal(result.body.confirmation.totalQuestions, 2);
+  assert.ok(result.body.confirmation.submittedAt);
+});
+
+// TEST 2: Reference number does not change.
+test('BE-18: reference number is stable across fetches', async () => {
+  await createExam();
+
+  const started = await start();
+  const id = started.body.attemptId;
+
+  await submit(id);
+
+  const first = await confirmation(id);
+  const second = await confirmation(id);
+
+  assert.equal(first.status, 200);
+  assert.equal(second.status, 200);
+
+  assert.equal(
+    first.body.confirmation.referenceNumber,
+    second.body.confirmation.referenceNumber
+  );
+
+  assert.equal(
+    first.body.confirmation.referenceNumber,
+    id
+  );
+});
+
+// TEST 3: Another student cannot view confirmation.
+test('BE-18: another student receives 403', async () => {
+  await createExam();
+
+  const started = await start();
+  const id = started.body.attemptId;
+
+  await submit(id);
+
+  const result = await confirmation(id, outsider.token);
+
+  assert.equal(result.status, 403);
+});
+
+// TEST 4: Scores are hidden before release.
+test('BE-18: confirmation hides unreleased scores', async () => {
+  await createExam();
+
+  const started = await start();
+  const id = started.body.attemptId;
+
+  await save(id, 'q-1', '4');
+  await submit(id);
+
+  const result = await confirmation(id);
+
+  assert.equal(result.status, 200);
+
+  assert.equal(
+    Object.hasOwn(result.body.confirmation, 'percentage'),
+    false
+  );
+
+  assert.equal(
+    Object.hasOwn(result.body.confirmation, 'totalScore'),
+    false
+  );
+});
+
+// TEST 5: Released results can include the score.
+test('BE-18: confirmation shows released scores', async () => {
+  await createExam();
+
+  const started = await start();
+  const id = started.body.attemptId;
+
+  // One correct answer out of two questions = 50%.
+  await save(id, 'q-1', '4');
+  await submit(id);
+
+  await Exam.updateOne(
+    { examId: 'exam-1' },
+    { $set: { resultsReleased: true } }
+  );
+
+  await Grade.updateOne(
+    {
+      examId: 'exam-1',
+      studentId: student.user.studentId
+    },
+    { $set: { released: true } }
+  );
+
+  const result = await confirmation(id);
+
+  assert.equal(result.status, 200);
+  assert.equal(result.body.confirmation.percentage, 50);
+});
+
+// TEST 6: Confirmation requires a submitted exam.
+test('BE-18: in-progress attempt returns 409', async () => {
+  await createExam();
+
+  const started = await start();
+  const id = started.body.attemptId;
+
+  const result = await confirmation(id);
+
+  assert.equal(result.status, 409);
+});
+
+// TEST 7: Authentication is required.
+test('BE-18: confirmation requires authentication', async () => {
+  await createExam();
+
+  const started = await start();
+  const id = started.body.attemptId;
+
+  await submit(id);
+
+  const result = await request(
+    'GET',
+    `/attempts/${id}/confirmation`,
+    null
+  );
+
+  assert.equal(result.status, 401);
+});
