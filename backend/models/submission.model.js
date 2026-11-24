@@ -60,13 +60,17 @@ const schema = new mongoose.Schema({
   submissionId: { type: String, required: true, unique: true, index: true, default: () => randomUUID() },
   examId: { type: String, required: true, index: true },
   studentId: { type: String, required: true },
+  sessionId: { type: String, default: null },
   status: { type: String, enum: ['in_progress', 'submitted', 'needs_grading', 'graded'], default: 'in_progress' },
   answers: { type: [answerSchema], default: [] },
   totalScore: { type: Number, default: 0, min: 0 },
   totalPoints: { type: Number, default: 0, min: 0 },
   submittedAt: { type: Date, default: null },
   gradedAt: { type: Date, default: null },
-}, { timestamps: true, versionKey: false });
+}, {
+  timestamps: true,
+  optimisticConcurrency: true
+});
 schema.index({ examId: 1, status: 1, submittedAt: -1 });
 schema.index({ examId: 1, studentId: 1 }, { unique: true });
 schema.pre('save', async function () {

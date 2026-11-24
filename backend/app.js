@@ -9,6 +9,8 @@ import gradebookRoutes from './routes/gradebook.routes.js';
 import { uploadDirectory } from './services/photo.service.js';
 import { authenticate } from './services/auth.service.js';
 import studentRoutes from './routes/student.routes.js';
+import attemptRoutes from './routes/attempt.routes.js';
+import eventRoutes from './routes/event.routes.js';
 
 const app = express();
 
@@ -19,8 +21,8 @@ app.use((request, response, next) => {
   if (origin && allowedOrigins.includes(origin)) {
     response.set('Access-Control-Allow-Origin', origin);
     response.set('Vary', 'Origin');
-    response.set('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
-    response.set('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+    response.set('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+    response.set('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Attempt-Session');
   }
   if (request.method === 'OPTIONS') return response.sendStatus(204);
   return next();
@@ -42,6 +44,8 @@ app.use('/api/questions', questionRoutes);
 app.use('/api/submissions', submissionRoutes);
 app.use('/api/gradebook', gradebookRoutes);
 app.use('/api/student', studentRoutes);
+app.use('/api/attempts', attemptRoutes);
+app.use('/api/events', eventRoutes);
 app.use((_request, response) => response.status(404).json({ error: 'Route not found' }));
 
 app.use((error, _request, response, _next) => {
