@@ -1,0 +1,9 @@
+node_modules/
+.env
+uploads/*
+!uploads/.gitkeep
+
+SUBMISSIONS_GRADING.md
+GRADEBOOK.md 
+ANALYTICS.md 
+
