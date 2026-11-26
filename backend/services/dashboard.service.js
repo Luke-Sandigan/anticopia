@@ -24,6 +24,8 @@ async function recentAlerts(examIds) {
   ]));
   return flags.map((flag) => ({
     id: String(flag._id),
+    examId: flag.examId,
+    studentId: flag.studentId,
     type: flagType(flag),
     student: names.get(flag.studentId) || flag.studentId,
     details: typeof flag.evidence?.details === 'string' ? flag.evidence.details : null,
@@ -48,6 +50,7 @@ async function latestExamSummary(examIds, enrollments) {
     getExamScoreSummary(exam),
   ]);
   return {
+    examId: exam.examId,
     title: exam.name,
     averageScore: scores.gradedSubmissions ? scores.average : null,
     submitted,

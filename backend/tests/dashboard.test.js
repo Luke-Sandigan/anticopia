@@ -92,7 +92,7 @@ beforeEach(async () => {
   ]);
 });
 
-test('FO-04 returns an empty dashboard for a teacher with no active classes', async () => {
+test('FO-05 returns an empty dashboard for a teacher with no active classes', async () => {
   const result = await request('GET', '/teacher/dashboard', otherTeacher.token);
 
   assert.equal(result.status, 200, JSON.stringify(result.body));
@@ -107,12 +107,12 @@ test('FO-04 returns an empty dashboard for a teacher with no active classes', as
   });
 });
 
-test('FO-04 requires an authenticated teacher dashboard request', async () => {
+test('FO-05 requires an authenticated teacher dashboard request', async () => {
   assert.equal((await request('GET', '/teacher/dashboard')).status, 401);
   assert.equal((await request('GET', '/teacher/dashboard', firstStudent.token)).status, 403);
 });
 
-test('FO-04 isolates teacher data and preserves dashboard response contents', async () => {
+test('FO-05 exposes only owned alert identifiers and preserves dashboard response contents', async () => {
   await Class.create({ classId: 'other-301', name: 'Private class', section: 'B',
     subject: 'IT', term: '2026', code: 'PRIVATE', teacherId: otherTeacher.user.id });
   await Exam.create({ examId: 'private-exam', classId: 'other-301', name: 'Private exam', published: true });
@@ -129,7 +129,10 @@ test('FO-04 isolates teacher data and preserves dashboard response contents', as
     { examId: 'private-exam', studentId: secondStudent.user.studentId, status: 'needs_grading' },
   ]);
   await Flag.insertMany([
-    { examId: 'midterm', studentId: firstStudent.user.studentId, evidence: { eventType: 'tab_switch' } },
+    { examId: 'midterm', studentId: firstStudent.user.studentId, evidence: { eventType: 'left_tab' }, createdAt: new Date('2026-11-27T08:00:00.000Z') },
+    { examId: 'midterm', studentId: firstStudent.user.studentId, evidence: { eventType: 'tab_switch' }, createdAt: new Date('2026-11-27T10:00:00.000Z') },
+    { examId: 'midterm', studentId: secondStudent.user.studentId, type: 'fullscreen_exit', createdAt: new Date('2026-11-27T12:00:00.000Z') },
+    { examId: 'midterm', studentId: 'S-missing', type: 'copied_text', createdAt: new Date('2026-11-27T13:00:00.000Z') },
     { examId: 'midterm', studentId: secondStudent.user.studentId, status: 'resolved' },
     { examId: 'private-exam', studentId: secondStudent.user.studentId, type: 'copied_text' },
   ]);
@@ -140,13 +143,20 @@ test('FO-04 isolates teacher data and preserves dashboard response contents', as
   assert.deepEqual(ownDashboard.body.stats, { classes: 1, students: 2, activeExams: 1, awaitingGrading: 1 });
   assert.deepEqual(ownDashboard.body.classes, [{ id: 'it-301', name: 'Algorithms', section: 'A', studentCount: 2 }]);
   assert.deepEqual(ownDashboard.body.exams.map((exam) => [exam.id, exam.status]), [['midterm', 'ongoing'], ['empty-final', 'draft']]);
-  assert.deepEqual(ownDashboard.body.alerts.map((alert) => [alert.type, alert.student]), [['tab_switch', 'S-301 Test']]);
-  assert.deepEqual(ownDashboard.body.summary, { title: 'Midterm', averageScore: 85, submitted: 2, enrolled: 2 });
+  assert.equal(ownDashboard.body.alerts.length, 3);
+  assert.deepEqual(ownDashboard.body.alerts.map((alert) => [alert.type, alert.examId, alert.studentId, alert.student]), [
+    ['copied_text', 'midterm', 'S-missing', 'S-missing'],
+    ['fullscreen_exit', 'midterm', secondStudent.user.studentId, 'S-302 Test'],
+    ['tab_switch', 'midterm', firstStudent.user.studentId, 'S-301 Test'],
+  ]);
+  assert.deepEqual(ownDashboard.body.summary, { examId: 'midterm', title: 'Midterm', averageScore: 85, submitted: 2, enrolled: 2 });
 
   const privateDashboard = await request('GET', '/teacher/dashboard', otherTeacher.token);
   assert.equal(privateDashboard.status, 200, JSON.stringify(privateDashboard.body));
   assert.deepEqual(privateDashboard.body.classes, [{ id: 'other-301', name: 'Private class', section: 'B', studentCount: 0 }]);
   assert.deepEqual(privateDashboard.body.exams.map((exam) => exam.id), ['private-exam']);
-  assert.deepEqual(privateDashboard.body.alerts.map((alert) => alert.type), ['copied_text']);
+  assert.deepEqual(privateDashboard.body.alerts.map((alert) => [alert.type, alert.examId, alert.studentId]), [
+    ['copied_text', 'private-exam', secondStudent.user.studentId],
+  ]);
   assert.deepEqual(privateDashboard.body.stats, { classes: 1, students: 0, activeExams: 1, awaitingGrading: 1 });
 });
