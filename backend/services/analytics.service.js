@@ -83,7 +83,7 @@ function questionAnalytics(exam, submissions) {
   });
 }
 
-function flagType(flag) {
+export function flagType(flag) {
   const evidence = flag.evidence && typeof flag.evidence === 'object' ? flag.evidence : {};
   for (const value of [flag.type, evidence.type, evidence.eventType, evidence.event]) {
     if (typeof value === 'string' && value.trim()) return value.trim();
@@ -121,6 +121,11 @@ function examSummary(exam, submissions, grades) {
     ...publicExam(exam),
     summary: scoreSummary(scores, exam.passingScore),
   };
+}
+
+export async function getExamScoreSummary(exam) {
+  const { submissions, grades } = await analyticsData([exam]);
+  return examSummary(exam, submissions, grades).summary;
 }
 
 export async function getExamAnalytics(examId, user) {

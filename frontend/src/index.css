@@ -113,7 +113,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .submission-progress { max-width: 100%; }
 .submission-progress p { font-size: 12px; }
 .progress-track { height: 7px; overflow: hidden; margin-top: 2px; border-radius: 99px; background: #e1e7ee; }
-.progress-track span { display: block; width: 93.75%; height: 100%; background: #2d76bf; }
+.progress-track span { display: block; height: 100%; background: #2d76bf; }
 .submission-progress small { color: var(--dashboard-muted); font-size: 10px; }
 .classes-panel { margin-top: 13px; }
 .class-cards { display: flex; flex-wrap: wrap; gap: 10px; }

@@ -92,6 +92,49 @@ beforeEach(async () => {
   ]);
 });
 
+test('teacher dashboard combines owned classes, exams, submissions, and open flags', async () => {
+  const path = '/teacher/dashboard';
+  const empty = await request('GET', path, otherTeacher.token);
+  assert.equal(empty.status, 200);
+  assert.deepEqual(empty.body, {
+    teacherName: 'other Test',
+    stats: { classes: 0, students: 0, activeExams: 0, awaitingGrading: 0 },
+    exams: [], alerts: [], summary: null, classes: [],
+  });
+
+  await Class.create({ classId: 'other-301', name: 'Private class', section: 'B',
+    subject: 'IT', term: '2026', code: 'PRIVATE', teacherId: otherTeacher.user.id });
+  await Exam.create({ examId: 'private-exam', classId: 'other-301', name: 'Private exam', published: true });
+  await Exam.updateOne({ examId: 'midterm' }, { $set: { published: true } });
+  await Submission.create({
+    examId: 'midterm',
+    studentId: firstStudent.user.studentId,
+    status: 'submitted',
+    answers: [{ questionId: 'midterm-choice', response: 'A' }, { questionId: 'midterm-boolean', response: true }],
+  });
+  await Grade.updateOne({ examId: 'midterm', studentId: firstStudent.user.studentId }, { $set: { percentage: 85 } });
+  await Submission.insertMany([
+    { examId: 'midterm', studentId: secondStudent.user.studentId, status: 'needs_grading' },
+    { examId: 'private-exam', studentId: secondStudent.user.studentId, status: 'needs_grading' },
+  ]);
+  await Flag.insertMany([
+    { examId: 'midterm', studentId: firstStudent.user.studentId, evidence: { eventType: 'tab_switch' } },
+    { examId: 'midterm', studentId: secondStudent.user.studentId, status: 'resolved' },
+    { examId: 'private-exam', studentId: secondStudent.user.studentId, type: 'copied_text' },
+  ]);
+
+  assert.equal((await request('GET', path)).status, 401);
+  assert.equal((await request('GET', path, firstStudent.token)).status, 403);
+  const { status, body } = await request('GET', path, teacher.token);
+  assert.equal(status, 200, JSON.stringify(body));
+  assert.equal(body.teacherName, 'teacher Test');
+  assert.deepEqual(body.stats, { classes: 1, students: 2, activeExams: 1, awaitingGrading: 1 });
+  assert.deepEqual(body.classes, [{ id: 'it-301', name: 'Algorithms', section: 'A', studentCount: 2 }]);
+  assert.deepEqual(body.exams.map((exam) => [exam.id, exam.status]), [['midterm', 'ongoing'], ['empty-final', 'draft']]);
+  assert.deepEqual(body.alerts.map((alert) => [alert.type, alert.student]), [['tab_switch', 'S-301 Test']]);
+  assert.deepEqual(body.summary, { title: 'Midterm', averageScore: 85, submitted: 2, enrolled: 2 });
+});
+
 test('BE-12 reports override-aware exam analytics, distributions, and question rates', async () => {
   await Submission.create([
     {
