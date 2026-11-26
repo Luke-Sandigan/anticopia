@@ -9,7 +9,7 @@ import examRoutes from './routes/exam.routes.js';
 import questionRoutes from './routes/question.routes.js';
 import submissionRoutes from './routes/submission.routes.js';
 import gradebookRoutes from './routes/gradebook.routes.js';
-import { getTeacherDashboard } from './services/dashboard.service.js';
+import dashboardRoutes from './routes/dashboard.routes.js';
 import { uploadDirectory } from './services/photo.service.js';
 import { authenticate } from './services/auth.service.js';
 
@@ -47,10 +47,7 @@ app.use('/api/gradebook', gradebookRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/attempts', attemptRoutes);
 app.use('/api/me', meRoutes);
-app.get('/api/teacher/dashboard', authenticate, async (request, response) => {
-  response.set('Cache-Control', 'private, no-store');
-  response.json(await getTeacherDashboard(request.user));
-});
+app.use('/api/teacher/dashboard', dashboardRoutes);
 app.use((_request, response) => response.status(404).json({ error: 'Route not found' }));
 
 app.use((error, _request, response, _next) => {
