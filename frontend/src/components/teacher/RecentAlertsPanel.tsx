@@ -1,4 +1,5 @@
 import type { TeacherDashboard } from '../../lib/teacherDashboardApi'
+import { Link } from 'react-router-dom'
 
 const alertTypes = new Map([
   ['tab_switch', { label: 'Left tab', details: 'Switched to another tab', tone: 'tab' }],
@@ -15,11 +16,16 @@ export function RecentAlertsPanel({ alerts }: { alerts: TeacherDashboard['alerts
       {!alerts.length && <p>No recent alerts.</p>}
       {alerts.length > 0 && <ul>{alerts.map((alert) => {
         const event = alertTypes.get(alert.type)
-        return <li key={alert.id}>
+        const content = <>
           <span className={`alert-type ${event?.tone ?? 'tab'}`}><i />{event?.label ?? 'Flagged activity'}</span>
           <strong>{alert.student}</strong>
           <p>{alert.details || event?.details || 'Activity flagged during the exam'}</p>
           <time dateTime={alert.createdAt}>{alertTime.format(new Date(alert.createdAt))}</time>
+        </>
+        return <li key={alert.id}>
+          {alert.examId && alert.studentId
+            ? <Link className="dashboard-detail-link" to={`/teacher/exams/${encodeURIComponent(alert.examId)}/alerts?${new URLSearchParams({ studentId: alert.studentId })}`}>{content}</Link>
+            : content}
         </li>
       })}</ul>}
     </section>

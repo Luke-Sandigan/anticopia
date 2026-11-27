@@ -7,6 +7,7 @@ import { SignInPage } from './pages/auth/SignInPage'
 import { TeacherSignUpPage } from './pages/teacher/signup/TeacherSignUpPage'
 import { StudentSignUpPage } from './pages/student/signup/StudentSignUpPage'
 import { TeacherDashboardPage } from './pages/teacher/dashboard/TeacherDashboardPage'
+import { ExamAlertsPage } from './pages/teacher/dashboard/ExamAlertsPage'
 import { StudentDashboardPage } from './pages/student/dashboard/StudentDashboardPage'
 import { StudentClassesPage } from './pages/student/classes/StudentClassesPage'
 import { TeacherClassesPage } from './pages/teacher/classes/TeacherClassesPage'
@@ -30,6 +31,7 @@ function App() {
       <Route path="/signup/teacher" element={<TeacherSignUpPage />} />
       <Route path="/signup/student" element={<StudentSignUpPage />} />
       <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
+      <Route path="/teacher/exams/:examId/alerts" element={<ExamAlertsPage />} />
       <Route path="/student/dashboard" element={<StudentDashboardPage />} />
       <Route path="/student/classes" element={<StudentClassesPage />} />
       <Route path="/student/exams" element={<StudentExamDetailsPage />} />

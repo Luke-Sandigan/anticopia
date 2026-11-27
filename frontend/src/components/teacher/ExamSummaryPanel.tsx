@@ -1,4 +1,5 @@
 import type { TeacherDashboard } from '../../lib/teacherDashboardApi'
+import { Link } from 'react-router-dom'
 
 export function ExamSummaryPanel({ summary }: { summary: TeacherDashboard['summary'] }) {
   return (
@@ -15,6 +16,7 @@ export function ExamSummaryPanel({ summary }: { summary: TeacherDashboard['summa
           <small>{summary.submitted} of {summary.enrolled} students</small>
         </div>
       </div> : <p>No exam submissions yet.</p>}
+      {summary?.examId && <Link to={`/teacher/exams/${encodeURIComponent(summary.examId)}/alerts`}>View exam alerts</Link>}
     </section>
   )
 }

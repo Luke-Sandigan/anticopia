@@ -28,7 +28,7 @@ export async function getExamAlerts(examId, user, studentId) {
     alertId: String(flag._id),
     examId: flag.examId,
     studentId: flag.studentId,
-    studentName: names.get(flag.studentId) || flag.studentId,
+    studentName: names.get(flag.studentId) || null,
     eventType: flagType(flag),
     details: typeof flag.evidence?.details === 'string' ? flag.evidence.details : null,
     status: flag.status,

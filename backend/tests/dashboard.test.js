@@ -127,7 +127,7 @@ test('exam alerts return all statuses, identifiers and missing students, with op
     studentName: 'S-301 Test', eventType: 'tab_switch', details: 'Left the tab', status: 'open',
     createdAt: flags[0].createdAt.toISOString() });
   const missing = result.body.find((alert) => alert.studentId === 'S-missing');
-  assert.equal(missing.studentName, 'S-missing');
+  assert.equal(missing.studentName, null);
   assert.equal(missing.status, 'resolved');
   assert.equal(missing.details, null);
   const filtered = await request('GET', '/dashboard/exams/midterm/alerts?studentId=S-missing', teacher.token);

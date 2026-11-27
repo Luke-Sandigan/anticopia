@@ -4,9 +4,32 @@ export type TeacherDashboard = {
   teacherName: string
   stats: { classes: number; students: number; activeExams: number; awaitingGrading: number }
   exams: { id: string; title: string; classCode: string; startsAt: string | null; status: 'ongoing' | 'scheduled' | 'draft' }[]
-  alerts: { id: string; type: string; student: string; details: string | null; createdAt: string }[]
-  summary: { title: string; averageScore: number | null; submitted: number; enrolled: number } | null
+  alerts: { id: string; examId?: string; studentId?: string; type: string; student: string; details: string | null; createdAt: string }[]
+  summary: { examId?: string; title: string; averageScore: number | null; submitted: number; enrolled: number } | null
   classes: { id: string; name: string; section: string; studentCount: number }[]
+}
+
+export type ExamAlert = {
+  alertId: string; examId: string; studentId: string; studentName: string | null
+  eventType: string; details: string | null; status: string; createdAt: string
+}
+
+export async function fetchExamAlerts(examId: string, studentId: string | null, signal: AbortSignal): Promise<ExamAlert[] | 'student' | 'not-found' | null> {
+  const token = window.sessionStorage.getItem(authTokenKey)
+  if (!token) return null
+  const query = studentId ? `?${new URLSearchParams({ studentId })}` : ''
+  const response = await fetch(`${apiBaseUrl}/dashboard/exams/${encodeURIComponent(examId)}/alerts${query}`, {
+    headers: { Authorization: `Bearer ${token}` }, signal,
+  })
+  if (response.status === 401) {
+    if (window.sessionStorage.getItem(authTokenKey) === token) window.sessionStorage.removeItem(authTokenKey)
+    return null
+  }
+  if (response.status === 403) return 'student'
+  if (response.status === 404) return 'not-found'
+  if (!response.ok) throw new Error('Could not load alerts. Please try again.')
+  if (!response.headers.get('content-type')?.includes('application/json')) throw new Error('The alerts service returned an unexpected response.')
+  return response.json() as Promise<ExamAlert[]>
 }
 
 export async function fetchTeacherDashboard(signal: AbortSignal): Promise<TeacherDashboard | 'student' | null> {
