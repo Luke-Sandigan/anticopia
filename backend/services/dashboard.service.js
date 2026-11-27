@@ -5,11 +5,36 @@ import { Flag } from '../models/flag.model.js';
 import { Submission } from '../models/submission.model.js';
 import { User } from '../models/user.model.js';
 import { flagType, getExamScoreSummary } from './analytics.service.js';
-import { teacherOnly } from './class.service.js';
+import { fail, teacherOnly } from './class.service.js';
 import { examStatus } from './exam.service.js';
 
 const submittedStatuses = ['submitted', 'needs_grading', 'graded'];
 const examPriority = { ongoing: 0, scheduled: 1, draft: 2 };
+
+export async function getExamAlerts(examId, user, studentId) {
+  teacherOnly(user);
+  const exam = await Exam.findOne({ examId }).select('classId').lean();
+  if (!exam || !await Class.exists({ classId: exam.classId, teacherId: user.id })) {
+    fail(404, 'Exam not found');
+  }
+  const flags = await Flag.find({ examId, ...(studentId === undefined ? {} : { studentId }) })
+    .sort({ createdAt: -1, _id: -1 }).lean();
+  const students = await User.find({ role: 'student', studentId: { $in: flags.map((flag) => flag.studentId) } })
+    .select('studentId firstName lastName').lean();
+  const names = new Map(students.map((student) => [
+    student.studentId, `${student.firstName} ${student.lastName}`.trim(),
+  ]));
+  return flags.map((flag) => ({
+    alertId: String(flag._id),
+    examId: flag.examId,
+    studentId: flag.studentId,
+    studentName: names.get(flag.studentId) || flag.studentId,
+    eventType: flagType(flag),
+    details: typeof flag.evidence?.details === 'string' ? flag.evidence.details : null,
+    status: flag.status,
+    createdAt: flag.createdAt,
+  }));
+}
 
 async function recentAlerts(examIds) {
   const flags = await Flag.find({ examId: { $in: examIds }, status: 'open' })

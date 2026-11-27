@@ -112,6 +112,40 @@ test('FO-05 requires an authenticated teacher dashboard request', async () => {
   assert.equal((await request('GET', '/teacher/dashboard', firstStudent.token)).status, 403);
 });
 
+test('exam alerts return all statuses, identifiers and missing students, with optional student filtering', async () => {
+  const flags = await Flag.insertMany([
+    { examId: 'midterm', studentId: 'S-301', evidence: { eventType: 'tab_switch', details: 'Left the tab' } },
+    { examId: 'midterm', studentId: 'S-missing', type: 'copied_text', status: 'resolved' },
+    { examId: 'empty-final', studentId: 'S-301', type: 'other' },
+  ]);
+  const result = await request('GET', '/dashboard/exams/midterm/alerts', teacher.token);
+  assert.equal(result.status, 200, JSON.stringify(result.body));
+  assert.equal(result.response.headers.get('cache-control'), 'private, no-store');
+  assert.equal(result.body.length, 2);
+  const first = result.body.find((alert) => alert.studentId === 'S-301');
+  assert.deepEqual(first, { alertId: String(flags[0]._id), examId: 'midterm', studentId: 'S-301',
+    studentName: 'S-301 Test', eventType: 'tab_switch', details: 'Left the tab', status: 'open',
+    createdAt: flags[0].createdAt.toISOString() });
+  const missing = result.body.find((alert) => alert.studentId === 'S-missing');
+  assert.equal(missing.studentName, 'S-missing');
+  assert.equal(missing.status, 'resolved');
+  assert.equal(missing.details, null);
+  const filtered = await request('GET', '/dashboard/exams/midterm/alerts?studentId=S-missing', teacher.token);
+  assert.equal(filtered.status, 200);
+  assert.deepEqual(filtered.body, [missing]);
+  assert.deepEqual((await request('GET', '/dashboard/exams/midterm/alerts?studentId=S-302', teacher.token)).body, []);
+});
+
+test('exam alerts require a teacher and conceal exams owned by another teacher', async () => {
+  const path = '/dashboard/exams/midterm/alerts';
+  assert.equal((await request('GET', path)).status, 401);
+  assert.equal((await request('GET', path, firstStudent.token)).status, 403);
+  assert.equal((await request('GET', path, otherTeacher.token)).status, 404);
+  assert.equal((await request('GET', '/dashboard/exams/nonexistent/alerts', teacher.token)).status, 404);
+  assert.equal((await request('GET', '/dashboard/exams/%24invalid/alerts', teacher.token)).status, 400);
+  assert.equal((await request('GET', '/dashboard/exams/midterm/alerts?studentId=%24invalid', teacher.token)).status, 400);
+});
+
 test('FO-05 exposes only owned alert identifiers and preserves dashboard response contents', async () => {
   await Class.create({ classId: 'other-301', name: 'Private class', section: 'B',
     subject: 'IT', term: '2026', code: 'PRIVATE', teacherId: otherTeacher.user.id });

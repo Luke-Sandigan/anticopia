@@ -48,6 +48,7 @@ app.use('/api/student', studentRoutes);
 app.use('/api/attempts', attemptRoutes);
 app.use('/api/me', meRoutes);
 app.use('/api/teacher/dashboard', dashboardRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 app.use((_request, response) => response.status(404).json({ error: 'Route not found' }));
 
 app.use((error, _request, response, _next) => {
